@@ -1,5 +1,8 @@
-// Stripe configuration - USE YOUR LIVE KEY
-const stripe = Stripe('pk_live_51S61rl3R6cTsuNiveVPhdFEC72CSCQ1KpcUrlz2XmQB0xcNCiBCbuwPtkEjg2C7HrnvZmy5K0CSJS79ZoBeGh1A600yPMvTplX');
+// Stripe configuration - REGENERATE YOUR KEY!
+const stripe = Stripe('pk_live_51S61rl3R6cTsuNivU8clI9Vjkc0Y901cm3xTTHA4BKRXTkNzxYZ717vvcNLuJiKTOjTC0nGUv7RafWPi2a0ZhNvi00GweHVKDW'); // REGENERATE THIS!
+
+// API Configuration
+const API_URL = "https://everlasting-landing-page-backend.onrender.com";
 
 // Global variables
 let currentTotal = 22;
@@ -209,8 +212,8 @@ async function initiateStripePayment() {
         // Save order data to localStorage for backup
         localStorage.setItem('pendingOrder', JSON.stringify(orderData));
         
-        // Create checkout session with backend
-        const response = await fetch('https://your-backend-server.com/create-checkout-session', {
+        // Create checkout session with YOUR Render backend - UPDATED
+        const response = await fetch(`${API_URL}/api/create-checkout-session`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -270,9 +273,6 @@ async function initiateStripePayment() {
 
 // Fallback: Create direct Stripe payment link
 function createDirectPaymentLink(orderData) {
-    // This is a simplified version - in production, you should use your backend
-    // to create a Stripe Payment Link or Checkout Session
-    
     const productDescription = `${orderData.product} - Size: ${orderData.size}, Color: ${orderData.color}, Qty: ${orderData.quantity}`;
     
     // Create a simple payment page
