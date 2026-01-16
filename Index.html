@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everlasting Custom Print LLC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Stripe Payment Integration -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <!-- EmailJS Integration -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        /* All your existing CSS remains EXACTLY the same */
+        /* Reset & Base */
+        *{box-sizing:border-box;}
+        body{margin:0;font-family:Poppins,sans-serif;color:#333;}
+
+        /* Color Variables */
+        :root {
+            --white: #FFFFFF;
+            --black: #000000;
+            --red: #FF0000;
+            --yellow: #FFD700;
+            --light-pink: #FFB6C1;
+            --royal-blue: #4169E1;
+            --navy-blue: #001F3F;
+            --green: #008000;
+            --orange: #FF6600;
+            --light-blue: #ADD8E6;
+            --grey: #808080;
+        }
+
+        /* Top Banner */
+        .top-banner{
+            background:var(--orange);color:var(--white);text-align:center;
+            padding:14px;font-weight:700;font-size:1rem;
+            position:relative;z-index:1000;
+        }
+
+        /* Header */
+        header{
+            background:var(--navy-blue);color:var(--white);text-align:center;
+            padding:70px 20px;position:relative;
+        }
+
+        /* Logo Optimization for Navy Background */
+        .main-logo{
+            width:280px;max-width:85%;height:auto;
+            margin-bottom:25px;display:block;margin-left:auto;margin-right:auto;
+            border-radius:12px;padding:15px;background:rgba(255,255,255,0.05) !important;
+            box-shadow:0 8px 32px rgba(0,0,0,0.2);
+            border:1px solid rgba(255,255,255,0.1);
+            transition:all 0.3s ease;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+        }
+        .main-logo:hover{
+            transform:translateY(-3px);
+            box-shadow:0 12px 40px rgba(0,0,0,0.3);
+            border-color:rgba(255,215,0,0.3);
+        }
+        .footer-logo-img{
+            width:140px;height:auto;margin-bottom:20px;
+            filter:brightness(1.1) contrast(1.1);
+            border-radius:8px;padding:8px;
+            background:rgba(255,255,255,0.05);
+        }
+
+        /* Buttons */
+        .cta-btn{
+            background:linear-gradient(135deg,var(--yellow),var(--orange));
+            color:var(--navy-blue);padding:16px 45px;
+            border-radius:30px;text-decoration:none;font-weight:800;
+            display:inline-block;margin-top:20px;transition:all 0.3s;
+            font-size:1.1rem;letter-spacing:0.5px;
+            box-shadow:0 6px 20px rgba(255,215,0,0.3);
+        }
+        .cta-btn:hover{
+            background:linear-gradient(135deg,var(--orange),var(--yellow));
+            transform:translateY(-3px);
+            box-shadow:0 10px 25px rgba(255,215,0,0.4);
+            color:var(--navy-blue);
+        }
+        .pay-btn{
+            background:var(--royal-blue);color:var(--white);padding:18px;width:100%;
+            border:none;border-radius:12px;font-size:1.1rem;cursor:pointer;
+            margin-top:25px;transition:all 0.3s;font-weight:700;
+            border:2px solid var(--yellow);
+        }
+        .pay-btn:hover{
+            background:var(--navy-blue);transform:translateY(-2px);
+            box-shadow:0 8px 20px rgba(65,105,225,0.3);
+        }
+
+        /* Sections */
+        section{padding:70px 20px;}
+        .big-text{
+            font-size:2.4rem;font-weight:800;color:var(--navy-blue);
+            text-align:center;margin-bottom:15px;
+            text-shadow:2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .section-text{
+            max-width:900px;margin:0 auto 35px;
+            text-align:center;font-size:1.05rem;color:var(--grey);
+        }
+
+        /* Grid & Cards */
+        .grid{
+            display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+            gap:25px;max-width:1200px;margin:auto;
+        }
+        .card{
+            background:var(--white);border-radius:18px;padding:25px;
+            box-shadow:0 10px 25px rgba(0,0,0,.1);
+            transition:transform 0.3s;border-top:4px solid var(--royal-blue);
+        }
+        .card:hover{
+            transform:translateY(-8px);box-shadow:0 15px 35px rgba(0,0,0,.15);
+            border-top-color:var(--yellow);
+        }
+        .card h3{color:var(--navy-blue);margin-top:0;}
+
+        /* OFFERS SECTION */
+        .offers-section {
+            background: linear-gradient(135deg, var(--white) 0%, var(--light-blue) 100%);
+            padding: 80px 20px;
+        }
+
+        .offers-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* Bulk Offers Box */
+        .bulk-offers-box {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 31, 63, 0.1);
+            border: 2px solid var(--royal-blue);
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .offers-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--yellow);
+        }
+
+        .offers-header h3 {
+            color: var(--navy-blue);
+            font-size: 1.8rem;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .offers-header h3 i {
+            color: var(--yellow);
+        }
+
+        .offers-subtitle {
+            color: var(--grey);
+            font-size: 1.1rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .product-offer-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid var(--light-blue);
+            transition: all 0.3s;
+        }
+
+        .product-offer-group:hover {
+            border-color: var(--yellow);
+            background: var(--white);
+            transform: translateY(-3px);
+        }
+
+        .mugs-offer {
+            background: linear-gradient(135deg, var(--white) 0%, var(--light-pink) 100%);
+            border: 1px dashed var(--orange);
+        }
+
+        .product-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .product-icon {
+            font-size: 1.8rem;
+            width: 50px;
+            height: 50px;
+            background: var(--navy-blue);
+            color: var(--yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-header h4 {
+            color: var(--navy-blue);
+            font-size: 1.4rem;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .product-tag {
+            background: var(--yellow);
+            color: var(--navy-blue);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .price-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .price-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            padding: 12px 15px;
+            background: var(--white);
+            border-radius: 10px;
+            border: 1px solid var(--light-blue);
+            align-items: center;
+        }
+
+        .price-row.highlight {
+            background: linear-gradient(135deg, var(--navy-blue), var(--royal-blue));
+            border-color: var(--yellow);
+        }
+
+        .price-row.highlight .quantity,
+        .price-row.highlight .price,
+        .price-row.highlight .free-item {
+            color: var(--white);
+        }
+
+        .quantity {
+            font-weight: 600;
+            color: var(--navy-blue);
+            font-size: 0.95rem;
+        }
+
+        .price {
+            font-weight: 700;
+            color: var(--navy-blue);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .free-item {
+            color: var(--red);
+            font-weight: 600;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+
+        .offer-note {
+            background: var(--light-pink);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            color: var(--orange);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .offer-note i {
+            color: var(--yellow);
+        }
+
+        .offers-footer {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--light-blue);
+            border-radius: 15px;
+            border-left: 4px solid var(--yellow);
+        }
+
+        .offers-footer p {
+            margin: 10px 0;
+            color: var(--navy-blue);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .offers-footer i {
+            color: var(--yellow);
+        }
+
+        /* Summary Box */
+        .offers-summary-box {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 31, 63, 0.1);
+            border: 2px solid var(--royal-blue);
+        }
+
+        .summary-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--yellow);
+        }
+
+        .summary-header h3 {
+            color: var(--navy-blue);
+            font-size: 1.6rem;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .summary-header p {
+            color: var(--grey);
+            margin: 0;
+        }
+
+        .savings-example {
+            background: var(--light-blue);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .savings-example h4 {
+            color: var(--navy-blue);
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .savings-item {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid var(--light-blue);
+        }
+
+        .savings-desc {
+            font-weight: 600;
+            color: var(--navy-blue);
+            margin-bottom: 5px;
+        }
+
+        .savings-price {
+            color: var(--grey);
+            font-size: 0.9rem;
+            text-decoration: line-through;
+        }
+
+        .savings-discount {
+            color: var(--green);
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+
+        .savings-total {
+            color: var(--red);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .benefits-list {
+            margin-bottom: 30px;
+        }
+
+        .benefits-list h4 {
+            color: var(--navy-blue);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .benefits-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .benefits-list li {
+            padding: 8px 0;
+            color: var(--grey);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cta-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .main-cta-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--yellow), var(--orange));
+            color: var(--navy-blue);
+            padding: 20px 50px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .main-cta-btn:hover {
+            background: linear-gradient(135deg, var(--orange), var(--yellow));
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.4);
+            color: var(--navy-blue);
+        }
+
+        .main-cta-btn i {
+            margin-right: 15px;
+        }
+
+        .cta-note {
+            color: var(--grey);
+            font-size: 0.95rem;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        /* PRODUCTION PROCESS SECTION */
+        .production-section {
+            background: var(--white);
+            padding: 80px 20px;
+        }
+
+        .process-wrapper {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 31, 63, 0.1);
+            border: 2px solid var(--royal-blue);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid var(--royal-blue);
+            background: var(--navy-blue);
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            margin-bottom: 30px;
+        }
+        
+        .video-container.short {
+            padding-bottom: 177.78%; /* 9:16 Aspect Ratio for Shorts */
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .video-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .video-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 2px solid var(--royal-blue);
+        }
+        
+        .video-title {
+            padding: 15px;
+            background: var(--navy-blue);
+            color: var(--yellow);
+            text-align: center;
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .process-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .process-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--light-blue);
+            font-size: 1.1rem;
+            color: var(--grey);
+            display: flex;
+            align-items: center;
+        }
+
+        .process-list li:before {
+            content: "✓";
+            color: var(--green);
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.3rem;
+        }
+
+        /* Order Form - UPDATED FOR STRIPE */
+        .order-box{
+            max-width:760px;margin:auto;background:var(--white);
+            padding:40px;border-radius:22px;
+            box-shadow:0 15px 40px rgba(0,0,0,.15);
+            border:2px solid var(--royal-blue);
+        }
+        .order-box input,.order-box select{
+            width:100%;padding:14px;margin:10px 0;
+            border-radius:10px;border:2px solid var(--light-blue);
+            font-family:Poppins,sans-serif;font-size:1rem;
+            transition:all 0.3s;background:var(--white);
+        }
+        .order-box input:focus,.order-box select:focus{
+            border-color:var(--royal-blue);outline:none;
+            box-shadow:0 0 0 3px rgba(65,105,225,0.1);
+        }
+        
+        /* Stripe Card Element */
+        .stripe-element-container {
+            background: var(--white);
+            border: 2px solid var(--light-blue);
+            border-radius: 10px;
+            padding: 14px;
+            margin: 10px 0;
+        }
+        
+        /* Color Selection */
+        .color-selection {
+            margin: 20px 0;
+        }
+        
+        .color-selection h3 {
+            color: var(--navy-blue);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .color-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .color-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid var(--light-blue);
+            transition: all 0.3s;
+            margin-bottom: 8px;
+        }
+        
+        .color-option input[type="radio"] {
+            display: none;
+        }
+        
+        .color-option input[type="radio"]:checked + .color-circle {
+            border-color: var(--yellow);
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .color-label {
+            font-size: 0.8rem;
+            color: var(--grey);
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        /* Color specific circles */
+        .color-white { background-color: var(--white); border: 1px solid var(--grey); }
+        .color-black { background-color: var(--black); }
+        .color-red { background-color: var(--red); }
+        .color-yellow { background-color: var(--yellow); }
+        .color-light-pink { background-color: var(--light-pink); }
+        .color-royal-blue { background-color: var(--royal-blue); }
+        .color-navy-blue { background-color: var(--navy-blue); }
+        .color-green { background-color: var(--green); }
+        .color-orange { background-color: var(--orange); }
+        .color-light-blue { background-color: var(--light-blue); }
+        .color-grey { background-color: var(--grey); }
+        
+        #price-display{
+            margin-top:20px;font-weight:600;padding:20px;
+            background:var(--light-blue);border-radius:12px;
+            border-left:4px solid var(--yellow);
+        }
+        .warning-text{color:var(--red);font-weight:700;}
+
+        /* Reviews Carousel */
+        .reviews-container{
+            overflow:hidden;position:relative;
+            padding:20px 0 50px;max-width:1200px;margin:0 auto;
+        }
+        .reviews-carousel{padding:20px;}
+        .carousel-track{
+            display:flex;gap:25px;
+            animation:scroll 60s linear infinite;
+        }
+        .review-card{
+            flex:0 0 350px;background:var(--white);border-radius:18px;
+            padding:25px;box-shadow:0 10px 25px rgba(0,0,0,.1);
+            height:320px;overflow-y:auto;border-top:4px solid var(--royal-blue);
+        }
+        @keyframes scroll{
+            0%{transform:translateX(0);}
+            100%{transform:translateX(calc(-350px * 9 - 25px * 9));}
+        }
+        .reviews-carousel:hover .carousel-track{
+            animation-play-state:paused;
+        }
+        .carousel-dots{
+            display:flex;justify-content:center;gap:10px;margin-top:20px;
+        }
+        .dot{
+            width:12px;height:12px;border-radius:50%;
+            background:var(--grey);cursor:pointer;transition:all 0.3s;
+        }
+        .dot.active{background:var(--royal-blue);transform:scale(1.3);}
+
+        /* NAVY BLUE & GOLD PROFESSIONAL POP-UP BANNER */
+        #offer-popup{
+            position:fixed;bottom:30px;right:30px;width:420px;
+            background:var(--navy-blue);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,0.3);
+            z-index:9999;animation:slideIn 0.5s ease-out;
+            border:2px solid var(--yellow);overflow:hidden;
+        }
+        @keyframes slideIn{
+            from{transform:translateX(100px) scale(0.95);opacity:0;}
+            to{transform:translateX(0) scale(1);opacity:1;}
+        }
+        .offer-content{padding:0;}
+        .offer-header{
+            background:linear-gradient(135deg,var(--navy-blue),var(--royal-blue));
+            color:var(--yellow);padding:20px;border-radius:16px 16px 0 0;
+            display:flex;justify-content:space-between;align-items:center;
+            border-bottom:2px solid var(--yellow);
+        }
+        .offer-header h3{
+            margin:0;font-size:1.2rem;display:flex;align-items:center;gap:10px;
+            font-weight:700;letter-spacing:0.5px;
+        }
+        .close-offer{
+            font-size:2rem;cursor:pointer;font-weight:300;
+            transition:all 0.2s;line-height:1;color:var(--white);
+        }
+        .close-offer:hover{transform:scale(1.2);color:var(--yellow);}
+        .offer-body{
+            padding:25px;background:var(--navy-blue);color:var(--white);
+        }
+        .offer-badge{
+            background:var(--yellow);color:var(--navy-blue);padding:8px 20px;
+            border-radius:20px;font-size:0.9rem;font-weight:800;
+            display:inline-block;margin-bottom:20px;
+            text-transform:uppercase;letter-spacing:1px;
+        }
+        .offer-body h4{
+            margin:0 0 25px 0;color:var(--yellow);font-size:1.4rem;
+            font-weight:700;line-height:1.3;
+        }
+
+        /* Offer Tiers */
+        .offer-tiers{
+            display:grid;grid-template-columns:repeat(3,1fr);
+            gap:15px;margin-bottom:25px;
+        }
+        .tier{
+            background:rgba(255,255,255,0.05);border-radius:12px;
+            padding:20px;border:1px solid rgba(255,215,0,0.2);
+            transition:all 0.3s;
+        }
+        .tier:hover{
+            border-color:var(--yellow);background:rgba(255,215,0,0.05);
+        }
+        .tier.featured{
+            border:2px solid var(--yellow);background:rgba(255,215,0,0.1);
+            transform:scale(1.05);
+        }
+        .tier-header{
+            display:flex;justify-content:space-between;
+            align-items:center;margin-bottom:15px;
+        }
+        .tier-badge{
+            background:var(--yellow);color:var(--navy-blue);padding:5px 12px;
+            border-radius:15px;font-size:0.8rem;font-weight:700;
+        }
+        .tier-price{
+            color:var(--yellow);font-weight:700;font-size:1.1rem;
+        }
+        .tier-benefits{
+            list-style:none;padding:0;margin:0;
+        }
+        .tier-benefits li{
+            margin-bottom:10px;font-size:0.9rem;
+            display:flex;align-items:flex-start;gap:10px;
+        }
+        .offer-note{
+            color:var(--light-blue);font-size:0.85rem;text-align:center;
+            margin:20px 0;padding:12px;background:rgba(0,0,0,0.2);
+            border-radius:8px;display:flex;align-items:center;
+            justify-content:center;gap:8px;
+        }
+        .offer-cta{
+            text-align:center;margin-top:25px;
+        }
+        .offer-btn{
+            display:block;width:100%;background:linear-gradient(135deg,var(--yellow),var(--orange));
+            color:var(--navy-blue);text-align:center;padding:18px;border-radius:12px;
+            text-decoration:none;font-weight:800;margin:20px 0;
+            transition:all 0.3s;border:none;cursor:pointer;
+            font-size:1.1rem;letter-spacing:0.5px;
+            box-shadow:0 6px 20px rgba(255,215,0,0.3);
+        }
+        .offer-btn:hover{
+            background:linear-gradient(135deg,var(--orange),var(--yellow));
+            transform:translateY(-3px);box-shadow:0 10px 25px rgba(255,215,0,0.5);
+        }
+        .offer-expiry{
+            color:var(--light-blue);font-size:0.8rem;text-align:center;
+            margin-top:15px;display:flex;align-items:center;
+            justify-content:center;gap:8px;
+        }
+
+        /* WhatsApp - FIXED NUMBER */
+        .whatsapp{
+            position:fixed;bottom:20px;left:20px;background:#25D366;
+            color:var(--white);padding:16px 24px;border-radius:40px;
+            font-weight:700;text-decoration:none;
+            box-shadow:0 8px 25px rgba(0,0,0,.3);z-index:9998;
+            transition:all 0.3s;display:flex;align-items:center;
+            gap:10px;font-size:1rem;
+        }
+        .whatsapp:hover{
+            background:#128C7E;transform:translateY(-3px);
+            box-shadow:0 12px 30px rgba(0,0,0,.4);
+        }
+
+        /* Footer */
+        footer{
+            background:var(--navy-blue);color:var(--white);text-align:center;padding:50px 20px;
+            border-top:3px solid var(--yellow);
+        }
+        footer p{
+            margin:10px 0;font-size:1rem;
+        }
+        footer p:nth-child(3){
+            color:var(--yellow);font-weight:600;
+        }
+
+        /* Payment Processing Modal */
+        .payment-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            display: none;
+        }
+
+        .payment-content {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 3px solid var(--yellow);
+        }
+
+        .payment-spinner {
+            border: 4px solid var(--light-blue);
+            border-top: 4px solid var(--yellow);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .payment-success {
+            color: var(--green);
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .offers-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .bulk-offers-box {
+                max-height: none;
+                overflow-y: visible;
+            }
+            
+            .video-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px){
+            .review-card{flex:0 0 300px;}
+            @keyframes scroll{
+                100%{transform:translateX(calc(-300px * 9 - 25px * 9));}
+            }
+            .big-text{font-size:1.8rem;}
+            header{padding:50px 20px;}
+            section{padding:50px 20px;}
+            .main-logo{width:220px;padding:10px;}
+            #offer-popup{
+                width:calc(100% - 40px);left:20px;right:20px;bottom:20px;
+            }
+            .offer-tiers{grid-template-columns:1fr;gap:20px;}
+            .tier.featured{transform:none;}
+            .whatsapp{
+                left:auto;right:20px;bottom:20px;
+                padding:14px 20px;font-size:0.9rem;
+            }
+            .offers-section {
+                padding: 60px 15px;
+            }
+            
+            .bulk-offers-box {
+                padding: 20px;
+            }
+            
+            .offers-header h3 {
+                font-size: 1.5rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .price-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                text-align: center;
+            }
+            
+            .quantity, .price, .free-item {
+                text-align: center !important;
+            }
+            
+            .main-cta-btn {
+                padding: 18px 30px;
+                font-size: 1.1rem;
+            }
+            
+            .process-wrapper {
+                padding: 20px;
+            }
+            
+            .color-options {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px){
+            .big-text{font-size:1.5rem;}
+            .section-text{font-size:0.95rem;}
+            .card{padding:20px;}
+            .main-logo{width:180px;}
+            .product-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .product-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+            
+            .product-header h4 {
+                font-size: 1.2rem;
+            }
+            
+            .video-title {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+            
+            .color-options {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .color-circle {
+                width: 35px;
+                height: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Payment Processing Modal -->
+    <div id="payment-modal" class="payment-modal">
+        <div class="payment-content">
+            <div id="payment-spinner" class="payment-spinner"></div>
+            <h3 id="payment-message">Processing Payment...</h3>
+            <p id="payment-details">Please wait while we process your order</p>
+        </div>
+    </div>
+
+    <div class="top-banner">
+        ⚡ SAME-DAY PRINT • 🚚 SAME-DAY SHIPPING • 🎁 FREE DELIVERY ON ALL PRODUCTS
+    </div>
+
+    <header>
+        <img src="https://i.imgur.com/MXm2uXP.jpeg" alt="Everlasting Custom Print Logo" class="main-logo">
+        
+        <h1>Everlasting Custom Print LLC</h1>
+        <p>High-Quality Custom Printing • Fast • Reliable • Professional</p>
+        <a href="#order" class="cta-btn">Order Now</a>
+    </header>
+
+    <!-- WHY CHOOSE US -->
+    <section>
+        <h2 class="big-text">WHY CHOOSE US</h2>
+        <p class="section-text">
+            Everlasting Custom Print LLC is trusted by businesses, nonprofits, churches, schools, and individuals
+            who need professional-quality custom printing delivered FAST. We don't outsource, we don't delay,
+            and we don't compromise quality.
+        </p>
+        <div class="grid">
+            <div class="card"><h3>⚡ SAME DAY PRINT</h3><p>Many orders are printed the same day.</p></div>
+            <div class="card"><h3>🚚 SAME DAY SHIPPING</h3><p>Urgent deadlines are our specialty.</p></div>
+            <div class="card"><h3>🎁 FREE DELIVERY</h3><p>No hidden delivery fees — ever.</p></div>
+            <div class="card"><h3>🖨️ PREMIUM QUALITY</h3><p>Bold colors, durable prints, retail finish.</p></div>
+            <div class="card"><h3>🤝 REAL SUPPORT</h3><p>Direct communication with the printer.</p></div>
+            <div class="card"><h3>⭐ 5-STAR REVIEWS</h3><p>Trusted and proven customer satisfaction.</p></div>
+        </div>
+    </section>
+
+    <!-- OFFERS SECTION -->
+    <section class="offers-section">
+        <h2 class="big-text">BULK DISCOUNTS & FREE ITEMS</h2>
+        <p class="section-text">
+            Get unbeatable bulk discounts and FREE items on every order. The more you order, the more you save!
+        </p>
+        
+        <div class="offers-container">
+            <!-- Left Column: Bulk Offers -->
+            <div class="bulk-offers-box">
+                <div class="offers-header">
+                    <h3>
+                        <i class="fas fa-gift"></i> 
+                        BULK DISCOUNTS & FREE ITEMS
+                    </h3>
+                    <p class="offers-subtitle">The more you order, the more you save!</p>
+                </div>
+                
+                <!-- T-SHIRTS OFFER -->
+                <div class="product-offer-group">
+                    <div class="product-header">
+                        <div class="product-icon">👕</div>
+                        <h4>Custom T-Shirts</h4>
+                        <span class="product-tag">Most Popular</span>
+                    </div>
+                    
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <div class="quantity">1-12 pieces</div>
+                            <div class="price">$22 each</div>
+                            <div class="free-item">Get 1 FREE</div>
+                        </div>
+                        <div class="price-row highlight">
+                            <div class="quantity">13-24 pieces</div>
+                            <div class="price">$20 each</div>
+                            <div class="free-item">Get 2 FREE</div>
+                        </div>
+                        <div class="price-row">
+                            <div class="quantity">25-49 pieces</div>
+                            <div class="price">$18 each</div>
+                            <div class="free-item">Get 2 FREE</div>
+                        </div>
+                        <div class="price-row highlight">
+                            <div class="quantity">50+ pieces</div>
+                            <div class="price">$16 each</div>
+                            <div class="free-item">Get 3 FREE</div>
+                        </div>
+                    </div>
+                    
+                    <div class="offer-note">
+                        <i class="fas fa-gift"></i> Free items are same size/quality. Minimum order: 12 pieces.
+                    </div>
+                </div>
+                
+                <!-- HOODIES OFFER -->
+                <div class="product-offer-group">
+                    <div class="product-header">
+                        <div class="product-icon">🧥</div>
+                        <h4>Custom Hoodies</h4>
+                    </div>
+                    
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <div class="quantity">1-23 pieces</div>
+                            <div class="price">$40 each</div>
+                            <div class="free-item">Get 1 T-Shirt</div>
+                        </div>
+                        <div class="price-row highlight">
+                            <div class="quantity">24-49 pieces</div>
+                            <div class="price">$35 each</div>
+                            <div class="free-item">Get 2 T-Shirts</div>
+                        </div>
+                        <div class="price-row">
+                            <div class="quantity">50+ pieces</div>
+                            <div class="price">$30 each</div>
+                            <div class="free-item">Get 3 T-Shirts</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SWEATSHIRTS OFFER -->
+                <div class="product-offer-group">
+                    <div class="product-header">
+                        <div class="product-icon">🧶</div>
+                        <h4>Custom Sweatshirts</h4>
+                    </div>
+                    
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <div class="quantity">1-23 pieces</div>
+                            <div class="price">$35 each</div>
+                            <div class="free-item">Get 1 T-Shirt</div>
+                        </div>
+                        <div class="price-row highlight">
+                            <div class="quantity">24-49 pieces</div>
+                            <div class="price">$30 each</div>
+                            <div class="free-item">Get 2 T-Shirts</div>
+                        </div>
+                        <div class="price-row">
+                            <div class="quantity">50+ pieces</div>
+                            <div class="price">$25 each</div>
+                            <div class="free-item">Get 3 T-Shirts</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- POLO SHIRTS OFFER -->
+                <div class="product-offer-group">
+                    <div class="product-header">
+                        <div class="product-icon">👔</div>
+                        <h4>Custom Polo Shirts</h4>
+                    </div>
+                    
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <div class="quantity">1-23 pieces</div>
+                            <div class="price">$35 each</div>
+                            <div class="free-item">Get 1 T-Shirt</div>
+                        </div>
+                        <div class="price-row highlight">
+                            <div class="quantity">24-49 pieces</div>
+                            <div class="price">$30 each</div>
+                            <div class="free-item">Get 2 T-Shirts</div>
+                        </div>
+                        <div class="price-row">
+                            <div class="quantity">50+ pieces</div>
+                            <div class="price">$25 each</div>
+                            <div class="free-item">Get 3 T-Shirts</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MUGS OFFER -->
+                <div class="product-offer-group mugs-offer">
+                    <div class="product-header">
+                        <div class="product-icon">☕</div>
+                        <h4>Custom Mugs</h4>
+                        <span class="product-tag">Special</span>
+                    </div>
+                    
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <div class="quantity">Small Orders</div>
+                            <div class="price">Custom Quote</div>
+                            <div class="free-item">Individual Pricing</div>
+                        </div>
+                        <div class="price-row highlight">
+                            <div class="quantity">100+ Mugs</div>
+                            <div class="price">Bulk Rate</div>
+                            <div class="free-item">Get 3 FREE</div>
+                        </div>
+                        <div class="price-row">
+                            <div class="quantity">200+ Mugs</div>
+                            <div class="price">Best Rate</div>
+                            <div class="free-item">Get 5 FREE</div>
+                        </div>
+                    </div>
+                    
+                    <div class="offer-note">
+                        <i class="fas fa-info-circle"></i> Contact us for exact mug pricing. Free mugs are same design.
+                    </div>
+                </div>
+                
+                <div class="offers-footer">
+                    <p><i class="fas fa-check-circle"></i> <strong>FREE ITEMS ON ALL ORDERS</strong> - Get free t-shirts with hoodie, sweatshirt & polo orders</p>
+                    <p><i class="fas fa-truck"></i> <strong>FREE DELIVERY</strong> - All orders include free shipping nationwide</p>
+                    <p><i class="fas fa-bolt"></i> <strong>SAME-DAY PRINTING</strong> - Most orders printed within 24 hours</p>
+                </div>
+            </div>
+            
+            <!-- Right Column: Summary & CTA -->
+            <div class="offers-summary-box">
+                <div class="summary-header">
+                    <h3><i class="fas fa-chart-line"></i> ORDER SUMMARY</h3>
+                    <p>See how much you save with bulk orders</p>
+                </div>
+                
+                <div class="savings-example">
+                    <h4><i class="fas fa-calculator"></i> Example Savings:</h4>
+                    <div class="savings-item">
+                        <div class="savings-desc">24 T-Shirts</div>
+                        <div class="savings-price">Regular: $528</div>
+                        <div class="savings-discount">With Bulk: $480</div>
+                        <div class="savings-total">You Save: $48 + 2 FREE!</div>
+                    </div>
+                    
+                    <div class="savings-item">
+                        <div class="savings-desc">50 Hoodies</div>
+                        <div class="savings-price">Regular: $2,000</div>
+                        <div class="savings-discount">With Bulk: $1,500</div>
+                        <div class="savings-total">You Save: $500 + 3 FREE T-Shirts!</div>
+                    </div>
+                    
+                    <div class="savings-item">
+                        <div class="savings-desc">100 Mugs</div>
+                        <div class="savings-desc">Get Bulk Rate +</div>
+                        <div class="savings-discount">3 FREE Mugs</div>
+                        <div class="savings-total">Maximum Value!</div>
+                    </div>
+                </div>
+                
+                <div class="benefits-list">
+                    <h4><i class="fas fa-star"></i> Why Bulk Orders Win:</h4>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Lower per-unit cost</li>
+                        <li><i class="fas fa-check"></i> Free bonus items</li>
+                        <li><i class="fas fa-check"></i> Priority production</li>
+                        <li><i class="fas fa-check"></i> Free shipping always</li>
+                        <li><i class="fas fa-check"></i> Consistent quality</li>
+                        <li><i class="fas fa-check"></i> One-time setup fee</li>
+                    </ul>
+                </div>
+                
+                <div class="cta-container">
+                    <button class="main-cta-btn" onclick="document.getElementById('order').scrollIntoView({behavior: 'smooth'})">
+                        <i class="fas fa-shopping-cart"></i> START YOUR ORDER NOW
+                    </button>
+                    <p class="cta-note">Select your product and quantity to see automatic discounts</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRODUCTION PROCESS SECTION -->
+    <section class="production-section">
+        <h2 class="big-text">OUR PRODUCTION PROCESS</h2>
+        <p class="section-text">
+            Watch our professional printing in action and see how we ensure every item meets our high standards.
+        </p>
+        
+        <div class="process-wrapper">
+            <h3 style="text-align: center; color: var(--navy-blue); margin-bottom: 25px;">
+                <i class="fas fa-play-circle"></i> See Our Process in Action
+            </h3>
+            
+            <!-- Video Row -->
+            <div class="video-row">
+                <div class="video-card">
+                    <div class="video-container">
+                        <iframe src="https://player.vimeo.com/video/1154552992?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" 
+                                frameborder="0" 
+                                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin" 
+                                style="position:absolute;top:0;left:0;width:100%;height:100%;" 
+                                title="PRODUCTION - EVERLASTING CUSTOM PRINT LLC">
+                        </iframe>
+                    </div>
+                    <h4 class="video-title">Our Printing Process</h4>
+                </div>
+                
+                <div class="video-card">
+                    <div class="video-container short">
+                        <iframe src="https://player.vimeo.com/video/1154554225?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" 
+                                frameborder="0" 
+                                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin" 
+                                style="position:absolute;top:0;left:0;width:100%;height:100%;" 
+                                title="Promotion Video">
+                        </iframe>
+                    </div>
+                    <h4 class="video-title">Promotion Video</h4>
+                </div>
+            </div>
+            
+            <script src="https://player.vimeo.com/api/player.js"></script>
+            
+            <h4 style="color: var(--navy-blue); margin-top: 30px;">Our 5-Step Quality Process:</h4>
+            <ul class="process-list">
+                <li>Artwork Review - Every design is reviewed for print readiness and color optimization</li>
+                <li>High-Resolution Processing - Professional-grade equipment for vibrant colors</li>
+                <li>Precision Pressing - Expert pressing and curing for durable prints</li>
+                <li>Quality Inspection - Every item individually inspected for perfection</li>
+                <li>Same-Day Shipping - Most orders packed and shipped within 24 hours</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- UPDATED ORDER FORM WITH STRIPE PAYMENT -->
+    <section id="order">
+        <div class="order-box">
+            <h2 style="color: var(--navy-blue); text-align: center; margin-bottom: 30px;">
+                <i class="fas fa-credit-card"></i> Place Your Order & Pay Securely
+            </h2>
+            
+            <form id="payment-form">
+                <input id="name" placeholder="Full Name" required>
+                <input id="email" placeholder="Email Address" required type="email">
+                <input id="phone" placeholder="Phone Number" required type="tel">
+                <input id="address" placeholder="Delivery Address" required>
+                
+                <select id="product" onchange="calcPrice()" required>
+                    <option value="" disabled selected>Select Product</option>
+                    <option value="tshirt">T-Shirt</option>
+                    <option value="hoodie">Hoodie</option>
+                    <option value="polo">Polo Shirt</option>
+                    <option value="sweatshirt">Sweatshirt</option>
+                    <option value="mug">Mug</option>
+                </select>
+                
+                <select id="size" onchange="calcPrice()" required>
+                    <option value="" disabled selected>Select Size</option>
+                    <option>S</option><option>M</option><option>L</option>
+                    <option>XL</option><option>2XL</option><option>3XL</option>
+                    <option>4XL</option><option>5XL</option>
+                </select>
+                
+                <input id="qty" type="number" min="1" value="1" onchange="calcPrice()" oninput="calcPrice()" placeholder="Quantity" required>
+                
+                <!-- Color Selection -->
+                <div class="color-selection">
+                    <h3><i class="fas fa-palette"></i> Select Product Color</h3>
+                    <p>Choose from our premium color options:</p>
+                    
+                    <div class="color-options">
+                        <!-- White -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="white" required>
+                            <div class="color-circle color-white"></div>
+                            <span class="color-label">White</span>
+                        </label>
+                        
+                        <!-- Black -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="black">
+                            <div class="color-circle color-black"></div>
+                            <span class="color-label">Black</span>
+                        </label>
+                        
+                        <!-- Red -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="red">
+                            <div class="color-circle color-red"></div>
+                            <span class="color-label">Red</span>
+                        </label>
+                        
+                        <!-- Yellow -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="yellow">
+                            <div class="color-circle color-yellow"></div>
+                            <span class="color-label">Yellow</span>
+                        </label>
+                        
+                        <!-- Light Pink -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="light-pink">
+                            <div class="color-circle color-light-pink"></div>
+                            <span class="color-label">Light Pink</span>
+                        </label>
+                        
+                        <!-- Royal Blue -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="royal-blue">
+                            <div class="color-circle color-royal-blue"></div>
+                            <span class="color-label">Royal Blue</span>
+                        </label>
+                        
+                        <!-- Navy Blue -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="navy-blue">
+                            <div class="color-circle color-navy-blue"></div>
+                            <span class="color-label">Navy Blue</span>
+                        </label>
+                        
+                        <!-- Green -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="green">
+                            <div class="color-circle color-green"></div>
+                            <span class="color-label">Green</span>
+                        </label>
+                        
+                        <!-- Orange -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="orange">
+                            <div class="color-circle color-orange"></div>
+                            <span class="color-label">Orange</span>
+                        </label>
+                        
+                        <!-- Light Blue -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="light-blue">
+                            <div class="color-circle color-light-blue"></div>
+                            <span class="color-label">Light Blue</span>
+                        </label>
+                        
+                        <!-- Grey -->
+                        <label class="color-option">
+                            <input type="radio" name="color" value="grey">
+                            <div class="color-circle color-grey"></div>
+                            <span class="color-label">Grey</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <label><strong>Upload Your Artwork (PNG / PDF / AI)</strong></label>
+                <input type="file" id="artwork" accept=".png,.pdf,.ai,.jpg,.jpeg" required>
+                
+                <!-- Stripe Card Element -->
+                <div class="stripe-element-container">
+                    <label><strong><i class="fas fa-credit-card"></i> Payment Details</strong></label>
+                    <div id="card-element">
+                        <!-- Stripe will insert card fields here -->
+                    </div>
+                    <div id="card-errors" role="alert" style="color: var(--red); margin-top: 10px;"></div>
+                </div>
+                
+                <div id="price-display">
+                    <p>💰 <strong id="total">Total: $22 | Free Items: 0</strong></p>
+                    <p>🎁 <strong>FREE ITEMS:</strong> Free shirts, hoodies, polos, or mugs added based on order volume.</p>
+                    <p class="warning-text">
+                        ⚠️ IMPORTANT: Your design will be printed EXACTLY as uploaded.
+                        Please ensure correct spelling, size, and quality before submission.
+                    </p>
+                </div>
+                
+                <button type="submit" class="pay-btn" id="submit-button">
+                    <i class="fas fa-lock"></i> Pay Securely with Stripe
+                </button>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="color: var(--grey); font-size: 0.9rem;">
+                        <i class="fas fa-shield-alt"></i> Your payment is secured with 256-bit SSL encryption
+                    </p>
+                    <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
+                        <i class="fab fa-cc-visa fa-2x" style="color: #1a1f71;"></i>
+                        <i class="fab fa-cc-mastercard fa-2x" style="color: #eb001b;"></i>
+                        <i class="fab fa-cc-amex fa-2x" style="color: #2e77bc;"></i>
+                        <i class="fab fa-cc-discover fa-2x" style="color: #ff6000;"></i>
+                        <i class="fab fa-cc-stripe fa-2x" style="color: #6772e5;"></i>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- REVIEWS CAROUSEL -->
+    <section>
+        <h2 class="big-text">WHAT OUR CUSTOMERS SAY</h2>
+        <div class="reviews-container">
+            <div class="reviews-carousel">
+                <div class="carousel-track">
+                    <!-- Review cards (9 original + 9 duplicates for seamless scroll) -->
+                    <div class="review-card"><h3>Agbo Heating, Cooling, & Plumbing</h3><p>⭐⭐⭐⭐⭐</p><p>This is by far the best printing service I've ever experienced. Taiwo was incredibly responsive, professional, and truly attentive to detail.</p><p><strong>Owner Response:</strong> Thank you for trusting us with your T-shirts.</p></div>
+                    <div class="review-card"><h3>Tim Hurley</h3><p>⭐⭐⭐⭐⭐</p><p>I was in town for work and our branded tees did not arrive on time. I called Everlasting at 7:30PM and the phone was answered immediately.</p></div>
+                    <div class="review-card"><h3>Daisy Narkah</h3><p>⭐⭐⭐⭐⭐</p><p>Service was great and didn't take long to get the shirt back. It was easy to communicate with the owner.</p></div>
+                    <div class="review-card"><h3>Toine Winston</h3><p>⭐⭐⭐⭐⭐</p><p>Loved the work! I had a very specific vision and explained it verbally. The vision was made reality with this business.</p></div>
+                    <div class="review-card"><h3>Kristin</h3><p>⭐⭐⭐⭐⭐</p><p>Loved our tees! Thank you for making the process easy and stress-free.</p></div>
+                    <div class="review-card"><h3>Daniel Oni</h3><p>⭐⭐⭐⭐⭐</p><p>So fantastic!</p><p><strong>Owner Response:</strong> Thanks for the honest feedback.</p></div>
+                    <div class="review-card"><h3>Euodia Williams</h3><p>⭐⭐⭐⭐⭐</p><p>It was so much better than I expected for the price I paid. Great job!</p></div>
+                    <div class="review-card"><h3>Temitope Paulson</h3><p>⭐⭐⭐⭐⭐</p><p>Quick, impressive, and excellent delivery. Very flexible and affordable. Highly recommended.</p></div>
+                    <div class="review-card"><h3>The Post</h3><p>⭐⭐⭐⭐⭐</p><p>I contacted them for a T-shirt print for an outreach program. Their service was outstanding. Highly recommended.</p></div>
+                    
+                    <!-- Duplicate cards for seamless scrolling -->
+                    <div class="review-card duplicate"><h3>Agbo Heating, Cooling, & Plumbing</h3><p>⭐⭐⭐⭐⭐</p><p>This is by far the best printing service I've ever experienced. Taiwo was incredibly responsive, professional, and truly attentive to detail.</p><p><strong>Owner Response:</strong> Thank you for trusting us with your T-shirts.</p></div>
+                    <div class="review-card duplicate"><h3>Tim Hurley</h3><p>⭐⭐⭐⭐⭐</p><p>I was in town for work and our branded tees did not arrive on time. I called Everlasting at 7:30PM and the phone was answered immediately.</p></div>
+                    <div class="review-card duplicate"><h3>Daisy Narkah</h3><p>⭐⭐⭐⭐⭐</p><p>Service was great and didn't take long to get the shirt back. It was easy to communicate with the owner.</p></div>
+                    <div class="review-card duplicate"><h3>Toine Winston</h3><p>⭐⭐⭐⭐⭐</p><p>Loved the work! I had a very specific vision and explained it verbally. The vision was made reality with this business.</p></div>
+                    <div class="review-card duplicate"><h3>Kristin</h3><p>⭐⭐⭐⭐⭐</p><p>Loved our tees! Thank you for making the process easy and stress-free.</p></div>
+                    <div class="review-card duplicate"><h3>Daniel Oni</h3><p>⭐⭐⭐⭐⭐</p><p>So fantastic!</p><p><strong>Owner Response:</strong> Thanks for the honest feedback.</p></div>
+                    <div class="review-card duplicate"><h3>Euodia Williams</h3><p>⭐⭐⭐⭐⭐</p><p>It was so much better than I expected for the price I paid. Great job!</p></div>
+                    <div class="review-card duplicate"><h3>Temitope Paulson</h3><p>⭐⭐⭐⭐⭐</p><p>Quick, impressive, and excellent delivery. Very flexible and affordable. Highly recommended.</p></div>
+                    <div class="review-card duplicate"><h3>The Post</h3><p>⭐⭐⭐⭐⭐</p><p>I contacted them for a T-shirt print for an outreach program. Their service was outstanding. Highly recommended.</p></div>
+                </div>
+            </div>
+            <div class="carousel-dots" id="carousel-dots"></div>
+        </div>
+    </section>
+
+    <!-- NAVY BLUE & GOLD PROFESSIONAL POP-UP BANNER -->
+    <div id="offer-popup">
+        <div class="offer-content">
+            <div class="offer-header">
+                <h3><i class="fas fa-crown"></i> EXCLUSIVE BULK OFFER</h3>
+                <span class="close-offer" onclick="closeOffer()">×</span>
+            </div>
+            <div class="offer-body">
+                <div class="offer-badge">LIMITED TIME</div>
+                <h4>Premium Quality Printing at Bulk Rates</h4>
+                
+                <div class="offer-tiers">
+                    <div class="tier">
+                        <div class="tier-header">
+                            <span class="tier-badge">BASIC</span>
+                            <div class="tier-price">12+ Items</div>
+                        </div>
+                        <ul class="tier-benefits">
+                            <li><i class="fas fa-check"></i> Get 1 FREE Item</li>
+                            <li><i class="fas fa-check"></i> Premium Quality Prints</li>
+                            <li><i class="fas fa-check"></i> Free Delivery</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tier featured">
+                        <div class="tier-header">
+                            <span class="tier-badge">PRO</span>
+                            <div class="tier-price">24+ Items</div>
+                        </div>
+                        <ul class="tier-benefits">
+                            <li><i class="fas fa-check"></i> Get 2 FREE Items</li>
+                            <li><i class="fas fa-check"></i> Priority Processing</li>
+                            <li><i class="fas fa-check"></i> Free Premium Upgrade</li>
+                            <li><i class="fas fa-check"></i> Dedicated Support</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tier">
+                        <div class="tier-header">
+                            <span class="tier-badge">ELITE</span>
+                            <div class="tier-price">50+ Items</div>
+                        </div>
+                        <ul class="tier-benefits">
+                            <li><i class="fas fa-check"></i> Get 3 FREE Items</li>
+                            <li><i class="fas fa-check"></i> Same-Day Production</li>
+                            <li><i class="fas fa-check"></i> Custom Packaging</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <p class="offer-note"><i class="fas fa-info-circle"></i> Applies to all apparel items. Mugs: 100+ (3 free) / 200+ (5 free)</p>
+                
+                <div class="offer-cta">
+                    <a href="#order" class="offer-btn" onclick="closeOffer()">
+                        <i class="fas fa-bolt"></i> START YOUR BULK ORDER
+                    </a>
+                    <p class="offer-expiry"><i class="far fa-clock"></i> Offer valid through end of month</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHATSAPP - FIXED NUMBER -->
+    <a class="whatsapp" href="https://wa.me/12409408778" target="_blank">
+        <i class="fab fa-whatsapp"></i> Chat With Us Now
+    </a>
+
+    <footer>
+        <div class="footer-logo">
+            <img src="https://i.imgur.com/MXm2uXP.jpeg" alt="Everlasting Custom Print Logo" class="footer-logo-img">
+        </div>
+        <p>Everlasting Custom Print LLC</p>
+        <p>7420 South Chappel Ave, Chicago</p>
+        <p>📞 240-940-8778</p>
+    </footer>
+
+    <script>
+        // ============================
+        // STRIPE PAYMENT INTEGRATION
+        // ============================
+        
+        // Initialize EmailJS with YOUR public key
+        emailjs.init('fMY1Ls0Rry1dL6joe');
+        
+        // Initialize Stripe with YOUR publishable key
+        const stripe = Stripe('pk_live_51S61rl3R6cTsuNiveVPhdFEC72CSCQ1KpcUrlz2XmQB0xcNCiBCbuwPtkEjg2C7HrnvZmy5K0CSJS79ZoBeGh1A600yPMvTplX');
+        
+        // Create Stripe elements
+        const elements = stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    color: '#333',
+                    fontFamily: '"Poppins", sans-serif',
+                    fontSmoothing: 'antialiased',
+                    fontSize: '16px',
+                    '::placeholder': {
+                        color: '#888'
+                    }
+                },
+                invalid: {
+                    color: '#FF0000',
+                    iconColor: '#FF0000'
+                }
+            }
+        });
+        
+        // Mount card element
+        cardElement.mount('#card-element');
+        
+        // Handle real-time validation errors from the card Element
+        cardElement.addEventListener('change', function(event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+        
+        // ============================
+        // YOUR EXISTING CALCULATOR CODE
+        // ============================
+        
+        function calcPrice(){
+            const qty = parseInt(document.getElementById('qty').value) || 0;
+            const product = document.getElementById('product').value;
+            const size = document.getElementById('size').value;
+            let price = 0, freeItems = 0;
+            let sizeExtra = (size==='4XL'||size==='5XL') ? 2 : 0;
+
+            // Updated pricing based on your requirements
+            if(product==='tshirt'){
+                if(qty>=50){price=16; freeItems=Math.floor(qty/50)*3;}
+                else if(qty>=24){price=18; freeItems=Math.floor(qty/24)*2;}
+                else if(qty>=12){price=20; freeItems=Math.floor(qty/12);}
+                else{price=22; freeItems=0;}
+            } else if(product==='hoodie'){
+                if(qty>=50){price=30; freeItems=Math.floor(qty/50)*3;}
+                else if(qty>=24){price=35; freeItems=Math.floor(qty/24)*2;}
+                else{price=40; freeItems=Math.floor(qty/12);}
+            } else if(product==='sweatshirt'){
+                if(qty>=50){price=25; freeItems=Math.floor(qty/50)*3;}
+                else if(qty>=24){price=30; freeItems=Math.floor(qty/24)*2;}
+                else{price=35; freeItems=Math.floor(qty/12);}
+            } else if(product==='polo'){
+                if(qty>=50){price=25; freeItems=Math.floor(qty/50)*3;}
+                else if(qty>=24){price=30; freeItems=Math.floor(qty/24)*2;}
+                else{price=35; freeItems=Math.floor(qty/12);}
+            } else if(product==='mug'){
+                if(qty>=200){price=0; freeItems=5;}
+                else if(qty>=100){price=0; freeItems=3;}
+                else{price=0; freeItems=0;}
+            }
+
+            const total = (qty*price)+sizeExtra;
+            document.getElementById('total').innerText = `Total: $${total} | Free Items: ${freeItems}`;
+            return total; // Return total for payment processing
+        }
+
+        // ============================
+        // PAYMENT FORM HANDLING
+        // ============================
+        
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const paymentModal = document.getElementById('payment-modal');
+        const paymentMessage = document.getElementById('payment-message');
+        const paymentDetails = document.getElementById('payment-details');
+        const paymentSpinner = document.getElementById('payment-spinner');
+        
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            // Validate form
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const product = document.getElementById('product').value;
+            const size = document.getElementById('size').value;
+            const qty = document.getElementById('qty').value;
+            const artwork = document.getElementById('artwork').files[0];
+            
+            // Get selected color
+            const colorRadio = document.querySelector('input[name="color"]:checked');
+            const color = colorRadio ? colorRadio.value : 'Not selected';
+            
+            if (!name || !email || !phone || !address || !product || !size || !qty || !artwork || !colorRadio) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Calculate total
+            const amount = calcPrice() * 100; // Convert to cents for Stripe
+            
+            if (amount <= 0) {
+                alert('Please select a valid product and quantity.');
+                return;
+            }
+            
+            // Disable submit button
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            // Show payment modal
+            paymentModal.style.display = 'flex';
+            paymentMessage.textContent = 'Creating Payment...';
+            paymentDetails.textContent = 'Please wait while we prepare your payment';
+            
+            try {
+                // Step 1: Create PaymentIntent on your server
+                const response = await fetch('YOUR_BACKEND_URL/create-payment-intent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        currency: 'usd',
+                        customer_name: name,
+                        customer_email: email,
+                        customer_phone: phone,
+                        shipping_address: address,
+                        product_type: product,
+                        size: size,
+                        quantity: qty,
+                        color: color
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to create payment');
+                }
+                
+                const { clientSecret, error } = await response.json();
+                
+                if (error) {
+                    throw new Error(error);
+                }
+                
+                // Update modal message
+                paymentMessage.textContent = 'Confirming Payment...';
+                paymentDetails.textContent = 'Please confirm your payment details';
+                
+                // Step 2: Confirm card payment with Stripe
+                const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            name: name,
+                            email: email,
+                            phone: phone,
+                            address: {
+                                line1: address
+                            }
+                        }
+                    }
+                });
+                
+                if (stripeError) {
+                    throw new Error(stripeError.message);
+                }
+                
+                if (paymentIntent.status === 'succeeded') {
+                    // Payment successful
+                    paymentSpinner.style.display = 'none';
+                    paymentMessage.innerHTML = '<div class="payment-success"><i class="fas fa-check-circle"></i></div>';
+                    paymentMessage.textContent = 'Payment Successful!';
+                    paymentDetails.textContent = 'Your order has been placed successfully';
+                    
+                    // Send confirmation emails via EmailJS
+                    try {
+                        // Send confirmation to customer
+                        await emailjs.send('service_2xe9bxe', 'template_tiwei0g', {
+                            to_name: name,
+                            to_email: email,
+                            order_number: paymentIntent.id.substring(0, 8),
+                            order_date: new Date().toLocaleDateString(),
+                            order_total: '$' + (amount / 100).toFixed(2),
+                            product_type: getProductName(product),
+                            size: size,
+                            quantity: qty,
+                            color: color,
+                            shipping_address: address
+                        });
+                        
+                        // Send notification to business
+                        await emailjs.send('service_2xe9bxe', 'template_5gsl6lj', {
+                            customer_name: name,
+                            customer_email: email,
+                            customer_phone: phone,
+                            order_number: paymentIntent.id.substring(0, 8),
+                            order_total: '$' + (amount / 100).toFixed(2),
+                            product_type: getProductName(product),
+                            size: size,
+                            quantity: qty,
+                            color: color,
+                            shipping_address: address,
+                            order_date: new Date().toLocaleDateString(),
+                            order_time: new Date().toLocaleTimeString()
+                        });
+                        
+                    } catch (emailError) {
+                        console.error('Email sending failed:', emailError);
+                        // Continue even if email fails
+                    }
+                    
+                    // Reset form after delay
+                    setTimeout(() => {
+                        paymentModal.style.display = 'none';
+                        form.reset();
+                        cardElement.clear();
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay Securely with Stripe';
+                        document.getElementById('qty').value = '1';
+                        calcPrice();
+                        
+                        // Show success message
+                        alert(`🎉 Payment Successful!\n\nOrder #: ${paymentIntent.id.substring(0, 8)}\nAmount: $${(amount/100).toFixed(2)}\n\nA confirmation email has been sent to ${email}. We will contact you shortly with production updates.`);
+                        
+                    }, 3000);
+                    
+                } else {
+                    throw new Error('Payment failed. Please try again.');
+                }
+                
+            } catch (error) {
+                console.error('Payment error:', error);
+                
+                // Hide modal and show error
+                paymentModal.style.display = 'none';
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay Securely with Stripe';
+                
+                // Show specific error message
+                document.getElementById('card-errors').textContent = error.message || 'An error occurred. Please try again.';
+                
+                // Alert user
+                alert('Payment failed: ' + error.message);
+            }
+        });
+        
+        // Helper function to get product name
+        function getProductName(productType) {
+            const products = {
+                'tshirt': 'Custom T-Shirt',
+                'hoodie': 'Custom Hoodie',
+                'polo': 'Custom Polo Shirt',
+                'sweatshirt': 'Custom Sweatshirt',
+                'mug': 'Custom Mug'
+            };
+            return products[productType] || 'Custom Product';
+        }
+        
+        // ============================
+        // YOUR EXISTING PAGE FUNCTIONALITY
+        // ============================
+        
+        // Close offer popup
+        function closeOffer() {
+            const popup = document.getElementById('offer-popup');
+            if(popup) {
+                popup.style.opacity = '0';
+                popup.style.transform = 'translateX(100px) scale(0.95)';
+                setTimeout(() => {
+                    popup.style.display = 'none';
+                }, 300);
+                
+                // Save to localStorage so it doesn't show again for 24 hours
+                localStorage.setItem('offerClosed', Date.now());
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            calcPrice();
+            
+            // Check if offer was recently closed (don't show for 24 hours)
+            const lastClosed = localStorage.getItem('offerClosed');
+            const offerPopup = document.getElementById('offer-popup');
+            
+            if(offerPopup && lastClosed) {
+                const hoursSinceClose = (Date.now() - lastClosed) / (1000 * 60 * 60);
+                if(hoursSinceClose < 24) {
+                    offerPopup.style.display = 'none';
+                } else {
+                    // Auto-hide after 30 seconds
+                    setTimeout(() => {
+                        if(offerPopup.style.display !== 'none') {
+                            closeOffer();
+                        }
+                    }, 30000);
+                }
+            } else if(offerPopup) {
+                // Auto-hide after 30 seconds if first time
+                setTimeout(() => {
+                    if(offerPopup.style.display !== 'none') {
+                        closeOffer();
+                    }
+                }, 30000);
+            }
+            
+            // Carousel setup
+            const track = document.querySelector('.carousel-track');
+            const cards = document.querySelectorAll('.review-card:not(.duplicate)');
+            const dotsContainer = document.getElementById('carousel-dots');
+            
+            // Create navigation dots
+            if(cards.length > 0 && dotsContainer) {
+                cards.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    if(index === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => {
+                        const cardWidth = document.querySelector('.review-card').offsetWidth + 25;
+                        track.style.transform = `translateX(-${index * cardWidth}px)`;
+                        document.querySelectorAll('.dot').forEach((d, i) => {
+                            d.classList.toggle('active', i === index);
+                        });
+                    });
+                    dotsContainer.appendChild(dot);
+                });
+                
+                // Pause carousel on hover
+                const carousel = document.querySelector('.reviews-carousel');
+                if(carousel) {
+                    carousel.addEventListener('mouseenter', () => {
+                        track.style.animationPlayState = 'paused';
+                    });
+                    carousel.addEventListener('mouseleave', () => {
+                        track.style.animationPlayState = 'running';
+                    });
+                }
+            }
+            
+            // Add gold accent to interactive elements
+            document.querySelectorAll('a, button').forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '0 4px 15px rgba(255, 215, 0, 0.3)';
+                });
+                element.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Logo hover enhancement
+            const logo = document.querySelector('.main-logo');
+            if(logo) {
+                logo.addEventListener('mouseenter', function() {
+                    this.style.filter = 'drop-shadow(0 0 12px rgba(255, 215, 0, 0.4))';
+                });
+                logo.addEventListener('mouseleave', function() {
+                    this.style.filter = 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.2))';
+                });
+            }
+            
+            // Color selection interaction
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('mouseenter', function() {
+                    const circle = this.querySelector('.color-circle');
+                    circle.style.transform = 'scale(1.05)';
+                });
+                
+                option.addEventListener('mouseleave', function() {
+                    const circle = this.querySelector('.color-circle');
+                    const radio = this.querySelector('input[type="radio"]');
+                    if(!radio.checked) {
+                        circle.style.transform = 'scale(1)';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
