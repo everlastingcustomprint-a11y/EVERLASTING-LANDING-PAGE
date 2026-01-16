@@ -212,8 +212,8 @@ async function initiateStripePayment() {
         // Save order data to localStorage for backup
         localStorage.setItem('pendingOrder', JSON.stringify(orderData));
         
-        // Create checkout session with YOUR Render backend - UPDATED
-        const response = await fetch(`${API_URL}/api/create-checkout-session`, {
+        // Create checkout session with YOUR Render backend - FIXED LINE 77
+        const response = await fetch(`${API_URL}/create-checkout-session`, {  // REMOVED /api
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
