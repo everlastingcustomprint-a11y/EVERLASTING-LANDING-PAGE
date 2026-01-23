@@ -7,9 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
-    <!-- Stripe Payment Integration -->
-    <script src="https://js.stripe.com/v3/"></script>
-    
     <!-- EmailJS Integration -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
@@ -32,6 +29,7 @@
             --orange: #FF6600;
             --light-blue: #ADD8E6;
             --grey: #808080;
+            --zelle-purple: #6d1e7f;
         }
 
         /* Top Banner */
@@ -84,15 +82,37 @@
             box-shadow:0 10px 25px rgba(255,215,0,0.4);
             color:var(--navy-blue);
         }
-        .pay-btn{
-            background:var(--royal-blue);color:var(--white);padding:18px;width:100%;
-            border:none;border-radius:12px;font-size:1.1rem;cursor:pointer;
-            margin-top:25px;transition:all 0.3s;font-weight:700;
-            border:2px solid var(--yellow);
+
+        /* Zelle Payment Button */
+        .zelle-btn {
+            background: linear-gradient(135deg, var(--zelle-purple) 0%, #8a2be2 100%);
+            color: var(--white);
+            padding: 18px;
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 25px;
+            font-weight: 700;
+            border: 2px solid var(--yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
         }
-        .pay-btn:hover{
-            background:var(--navy-blue);transform:translateY(-2px);
-            box-shadow:0 8px 20px rgba(65,105,225,0.3);
+        
+        .zelle-btn:hover {
+            background: linear-gradient(135deg, #8a2be2 0%, var(--zelle-purple) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(109, 30, 127, 0.3);
+        }
+
+        .zelle-btn:disabled {
+            background: var(--grey);
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* Sections */
@@ -553,7 +573,7 @@
             font-size: 1.3rem;
         }
 
-        /* Order Form - UPDATED FOR STRIPE */
+        /* Order Form */
         .order-box{
             max-width:760px;margin:auto;background:var(--white);
             padding:40px;border-radius:22px;
@@ -569,15 +589,6 @@
         .order-box input:focus,.order-box select:focus{
             border-color:var(--royal-blue);outline:none;
             box-shadow:0 0 0 3px rgba(65,105,225,0.1);
-        }
-        
-        /* Stripe Card Element */
-        .stripe-element-container {
-            background: var(--white);
-            border: 2px solid var(--light-blue);
-            border-radius: 10px;
-            padding: 14px;
-            margin: 10px 0;
         }
         
         /* Color Selection */
@@ -814,14 +825,14 @@
             color:var(--yellow);font-weight:600;
         }
 
-        /* Payment Processing Modal */
-        .payment-modal {
+        /* Payment Instructions Modal */
+        .zelle-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.95);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -829,24 +840,48 @@
             display: none;
         }
 
-        .payment-content {
+        .zelle-content {
             background: var(--white);
             padding: 40px;
             border-radius: 20px;
             max-width: 500px;
             width: 90%;
             text-align: center;
-            border: 3px solid var(--yellow);
+            border: 3px solid var(--zelle-purple);
         }
 
-        .payment-spinner {
-            border: 4px solid var(--light-blue);
-            border-top: 4px solid var(--yellow);
+        .zelle-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--zelle-purple);
+        }
+
+        .step-number {
+            background: var(--zelle-purple);
+            color: white;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--light-blue);
+            border-top: 3px solid var(--yellow);
+            border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
         }
 
         @keyframes spin {
@@ -854,10 +889,14 @@
             100% { transform: rotate(360deg); }
         }
 
-        .payment-success {
-            color: var(--green);
-            font-size: 2rem;
-            margin-bottom: 20px;
+        /* Success Message */
+        .success-message {
+            background: linear-gradient(135deg, var(--green), #4CAF50);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
         }
 
         /* Responsive Design */
@@ -974,12 +1013,98 @@
     </style>
 </head>
 <body>
-    <!-- Payment Processing Modal -->
-    <div id="payment-modal" class="payment-modal">
-        <div class="payment-content">
-            <div id="payment-spinner" class="payment-spinner"></div>
-            <h3 id="payment-message">Processing Payment...</h3>
-            <p id="payment-details">Please wait while we process your order</p>
+    <!-- Zelle Payment Instructions Modal -->
+    <div id="zelle-modal" class="zelle-modal">
+        <div class="zelle-content">
+            <h2 style="color: var(--zelle-purple); margin-top: 0;">
+                <i class="fas fa-university"></i> Pay with Zelle
+            </h2>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h3 id="order-number" style="color: var(--zelle-purple); margin-top: 0;">Order #: <span id="order-num-display"></span></h3>
+                <p><strong>Total Amount:</strong> <span id="zelle-amount" style="color: var(--green); font-weight: bold; font-size: 1.2rem;">$0.00</span></p>
+                <p><strong>Send to:</strong> <span style="color: var(--zelle-purple); font-weight: bold;">240-940-8778</span></p>
+                <p><strong>Name:</strong> Everlasting Custom Print LLC</p>
+            </div>
+            
+            <div class="zelle-step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Open your banking app</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">(Chase, Bank of America, Wells Fargo, etc.)</p>
+                </div>
+            </div>
+            
+            <div class="zelle-step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Go to Zelle in the app</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">Select "Send Money with Zelle"</p>
+                </div>
+            </div>
+            
+            <div class="zelle-step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Enter recipient: <span style="color: var(--zelle-purple); font-weight: bold;">240-940-8778</span></strong>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">Name: Everlasting Custom Print LLC</p>
+                </div>
+            </div>
+            
+            <div class="zelle-step">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Enter amount: <span id="zelle-amount-step" style="color: var(--green); font-weight: bold;">$0.00</span></strong>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">Add note: <span id="order-note">Order #[ORDER_NUMBER]</span></p>
+                </div>
+            </div>
+            
+            <div class="zelle-step">
+                <div class="step-number">5</div>
+                <div>
+                    <strong>Take screenshot & send via WhatsApp</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">We'll confirm your order within minutes</p>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                <button onclick="copyZelleDetails()" style="
+                    background: var(--zelle-purple);
+                    color: white;
+                    border: none;
+                    padding: 12px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-weight: 600;
+                ">
+                    <i class="fas fa-copy"></i> Copy Details
+                </button>
+                
+                <button onclick="sendWhatsAppConfirmation()" style="
+                    background: #25D366;
+                    color: white;
+                    border: none;
+                    padding: 12px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-weight: 600;
+                ">
+                    <i class="fab fa-whatsapp"></i> Send Screenshot
+                </button>
+            </div>
+            
+            <button onclick="closeZelleModal()" style="
+                width: 100%;
+                padding: 12px;
+                background: #ccc;
+                border: none;
+                border-radius: 5px;
+                margin-top: 10px;
+                cursor: pointer;
+                font-weight: 600;
+            ">
+                Close
+            </button>
         </div>
     </div>
 
@@ -1290,40 +1415,47 @@
         </div>
     </section>
 
-    <!-- UPDATED ORDER FORM WITH STRIPE PAYMENT -->
+    <!-- ORDER FORM WITH ZELLE PAYMENT -->
     <section id="order">
         <div class="order-box">
             <h2 style="color: var(--navy-blue); text-align: center; margin-bottom: 30px;">
-                <i class="fas fa-credit-card"></i> Place Your Order & Pay Securely
+                <i class="fas fa-shopping-cart"></i> Place Your Order
             </h2>
             
-            <form id="payment-form">
-                <input id="name" placeholder="Full Name" required>
-                <input id="email" placeholder="Email Address" required type="email">
-                <input id="phone" placeholder="Phone Number" required type="tel">
-                <input id="address" placeholder="Delivery Address" required>
+            <div id="success-message" class="success-message">
+                <h3><i class="fas fa-check-circle"></i> Order Submitted Successfully!</h3>
+                <p>Your order details have been sent to us. Please complete your Zelle payment to finalize your order.</p>
+                <p><strong>Order #:</strong> <span id="success-order-number"></span></p>
+                <p><strong>Amount:</strong> <span id="success-order-amount"></span></p>
+            </div>
+            
+            <form id="order-form">
+                <input id="name" placeholder="Full Name *" required>
+                <input id="email" placeholder="Email Address *" required type="email">
+                <input id="phone" placeholder="Phone Number *" required type="tel">
+                <input id="address" placeholder="Delivery Address *" required>
                 
                 <select id="product" onchange="calcPrice()" required>
-                    <option value="" disabled selected>Select Product</option>
+                    <option value="" disabled selected>Select Product *</option>
                     <option value="tshirt">T-Shirt</option>
                     <option value="hoodie">Hoodie</option>
                     <option value="polo">Polo Shirt</option>
                     <option value="sweatshirt">Sweatshirt</option>
-                    <option value="mug">Mug</option>
+                    <option value="mug">Mug (Contact for Pricing)</option>
                 </select>
                 
                 <select id="size" onchange="calcPrice()" required>
-                    <option value="" disabled selected>Select Size</option>
+                    <option value="" disabled selected>Select Size *</option>
                     <option>S</option><option>M</option><option>L</option>
                     <option>XL</option><option>2XL</option><option>3XL</option>
                     <option>4XL</option><option>5XL</option>
                 </select>
                 
-                <input id="qty" type="number" min="1" value="1" onchange="calcPrice()" oninput="calcPrice()" placeholder="Quantity" required>
+                <input id="qty" type="number" min="1" value="1" onchange="calcPrice()" oninput="calcPrice()" placeholder="Quantity *" required>
                 
                 <!-- Color Selection -->
                 <div class="color-selection">
-                    <h3><i class="fas fa-palette"></i> Select Product Color</h3>
+                    <h3><i class="fas fa-palette"></i> Select Product Color *</h3>
                     <p>Choose from our premium color options:</p>
                     
                     <div class="color-options">
@@ -1406,17 +1538,8 @@
                     </div>
                 </div>
                 
-                <label><strong>Upload Your Artwork (PNG / PDF / AI)</strong></label>
+                <label><strong>Upload Your Artwork (PNG / PDF / AI) *</strong></label>
                 <input type="file" id="artwork" accept=".png,.pdf,.ai,.jpg,.jpeg" required>
-                
-                <!-- Stripe Card Element -->
-                <div class="stripe-element-container">
-                    <label><strong><i class="fas fa-credit-card"></i> Payment Details</strong></label>
-                    <div id="card-element">
-                        <!-- Stripe will insert card fields here -->
-                    </div>
-                    <div id="card-errors" role="alert" style="color: var(--red); margin-top: 10px;"></div>
-                </div>
                 
                 <div id="price-display">
                     <p>💰 <strong id="total">Total: $22 | Free Items: 0</strong></p>
@@ -1427,21 +1550,23 @@
                     </p>
                 </div>
                 
-                <button type="submit" class="pay-btn" id="submit-button">
-                    <i class="fas fa-lock"></i> Pay Securely with Stripe
+                <!-- Zelle Payment Button -->
+                <button type="submit" class="zelle-btn" id="submit-button">
+                    <i class="fas fa-university"></i> Submit Order & Pay with Zelle
                 </button>
                 
                 <div style="text-align: center; margin-top: 20px;">
                     <p style="color: var(--grey); font-size: 0.9rem;">
-                        <i class="fas fa-shield-alt"></i> Your payment is secured with 256-bit SSL encryption
+                        <i class="fas fa-mobile-alt"></i> Zelle Payment to: <strong>240-940-8778</strong>
                     </p>
                     <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
-                        <i class="fab fa-cc-visa fa-2x" style="color: #1a1f71;"></i>
-                        <i class="fab fa-cc-mastercard fa-2x" style="color: #eb001b;"></i>
-                        <i class="fab fa-cc-amex fa-2x" style="color: #2e77bc;"></i>
-                        <i class="fab fa-cc-discover fa-2x" style="color: #ff6000;"></i>
-                        <i class="fab fa-cc-stripe fa-2x" style="color: #6772e5;"></i>
+                        <i class="fas fa-shield-alt fa-2x" style="color: var(--zelle-purple);"></i>
+                        <i class="fas fa-bolt fa-2x" style="color: var(--orange);"></i>
+                        <i class="fas fa-truck fa-2x" style="color: var(--green);"></i>
                     </div>
+                    <p style="color: var(--grey); font-size: 0.8rem; margin-top: 10px;">
+                        After submitting order, you'll receive Zelle payment instructions
+                    </p>
                 </div>
             </form>
         </div>
@@ -1557,53 +1682,13 @@
     </footer>
 
     <script>
-        // ============================
-        // STRIPE PAYMENT INTEGRATION
-        // ============================
+        // Initialize EmailJS with your public key
+        emailjs.init('fMY1Ls0Rry1dL6joe'); // Replace with your actual EmailJS public key
         
-        // Initialize EmailJS with YOUR public key
-        emailjs.init('fMY1Ls0Rry1dL6joe');
+        let currentOrder = null;
+        let orderNumber = '';
         
-        // Initialize Stripe with YOUR publishable key
-        const stripe = Stripe('pk_live_51S61rl3R6cTsuNiveVPhdFEC72CSCQ1KpcUrlz2XmQB0xcNCiBCbuwPtkEjg2C7HrnvZmy5K0CSJS79ZoBeGh1A600yPMvTplX');
-        
-        // Create Stripe elements
-        const elements = stripe.elements();
-        const cardElement = elements.create('card', {
-            style: {
-                base: {
-                    color: '#333',
-                    fontFamily: '"Poppins", sans-serif',
-                    fontSmoothing: 'antialiased',
-                    fontSize: '16px',
-                    '::placeholder': {
-                        color: '#888'
-                    }
-                },
-                invalid: {
-                    color: '#FF0000',
-                    iconColor: '#FF0000'
-                }
-            }
-        });
-        
-        // Mount card element
-        cardElement.mount('#card-element');
-        
-        // Handle real-time validation errors from the card Element
-        cardElement.addEventListener('change', function(event) {
-            const displayError = document.getElementById('card-errors');
-            if (event.error) {
-                displayError.textContent = event.error.message;
-            } else {
-                displayError.textContent = '';
-            }
-        });
-        
-        // ============================
-        // YOUR EXISTING CALCULATOR CODE
-        // ============================
-        
+        // Price calculator
         function calcPrice(){
             const qty = parseInt(document.getElementById('qty').value) || 0;
             const product = document.getElementById('product').value;
@@ -1611,7 +1696,6 @@
             let price = 0, freeItems = 0;
             let sizeExtra = (size==='4XL'||size==='5XL') ? 2 : 0;
 
-            // Updated pricing based on your requirements
             if(product==='tshirt'){
                 if(qty>=50){price=16; freeItems=Math.floor(qty/50)*3;}
                 else if(qty>=24){price=18; freeItems=Math.floor(qty/24)*2;}
@@ -1630,29 +1714,47 @@
                 else if(qty>=24){price=30; freeItems=Math.floor(qty/24)*2;}
                 else{price=35; freeItems=Math.floor(qty/12);}
             } else if(product==='mug'){
-                if(qty>=200){price=0; freeItems=5;}
-                else if(qty>=100){price=0; freeItems=3;}
-                else{price=0; freeItems=0;}
+                // Mugs require custom quote
+                price = 0;
+                freeItems = 0;
+                if(qty>=200){ freeItems=5; }
+                else if(qty>=100){ freeItems=3; }
             }
 
-            const total = (qty*price)+sizeExtra;
-            document.getElementById('total').innerText = `Total: $${total} | Free Items: ${freeItems}`;
-            return total; // Return total for payment processing
+            // Calculate total
+            let totalPrice = (price * qty) + (sizeExtra * qty);
+            let freeItemText = freeItems > 0 ? `Get ${freeItems} FREE ${product === 'mug' ? 'Mugs' : 'T-Shirts'}!` : '0';
+            
+            // Display price
+            if(product === 'mug') {
+                document.getElementById('total').innerHTML = `Total: Custom Quote | ${freeItemText}`;
+            } else {
+                document.getElementById('total').innerHTML = `Total: $${totalPrice} | Free Items: ${freeItems}`;
+            }
+
+            return { totalPrice, freeItems, price: price };
         }
 
-        // ============================
-        // PAYMENT FORM HANDLING
-        // ============================
-        
-        const form = document.getElementById('payment-form');
-        const submitButton = document.getElementById('submit-button');
-        const paymentModal = document.getElementById('payment-modal');
-        const paymentMessage = document.getElementById('payment-message');
-        const paymentDetails = document.getElementById('payment-details');
-        const paymentSpinner = document.getElementById('payment-spinner');
-        
-        form.addEventListener('submit', async (event) => {
+        // Generate order number
+        function generateOrderNumber() {
+            const date = new Date();
+            const year = date.getFullYear().toString().slice(-2);
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const random = Math.floor(1000 + Math.random() * 9000);
+            return `ECP${year}${month}${day}${random}`;
+        }
+
+        // Process order form
+        async function processOrder(event) {
             event.preventDefault();
+            
+            const submitButton = document.getElementById('submit-button');
+            const originalButtonText = submitButton.innerHTML;
+            
+            // Disable button and show loading
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<div class="spinner"></div> Submitting Order...';
             
             // Validate form
             const name = document.getElementById('name').value;
@@ -1663,194 +1765,181 @@
             const size = document.getElementById('size').value;
             const qty = document.getElementById('qty').value;
             const artwork = document.getElementById('artwork').files[0];
-            
-            // Get selected color
             const colorRadio = document.querySelector('input[name="color"]:checked');
             const color = colorRadio ? colorRadio.value : 'Not selected';
             
             if (!name || !email || !phone || !address || !product || !size || !qty || !artwork || !colorRadio) {
-                alert('Please fill in all required fields.');
+                alert('Please fill in all required fields marked with *.');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
                 return;
             }
             
-            // Calculate total
-            const amount = calcPrice() * 100; // Convert to cents for Stripe
+            // Calculate price
+            const priceData = calcPrice();
+            const totalPrice = priceData.totalPrice;
             
-            if (amount <= 0) {
-                alert('Please select a valid product and quantity.');
+            if (product === 'mug' && totalPrice === 0) {
+                alert('For mug orders, please contact us for a custom quote. You can reach us at 240-940-8778.');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
                 return;
             }
             
-            // Disable submit button
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            // Generate order number
+            orderNumber = generateOrderNumber();
             
-            // Show payment modal
-            paymentModal.style.display = 'flex';
-            paymentMessage.textContent = 'Creating Payment...';
-            paymentDetails.textContent = 'Please wait while we prepare your payment';
+            // Store order data
+            currentOrder = {
+                orderNumber: orderNumber,
+                name: name,
+                email: email,
+                phone: phone,
+                address: address,
+                product: document.getElementById('product').options[document.getElementById('product').selectedIndex].text,
+                size: size,
+                color: color,
+                quantity: qty,
+                unitPrice: priceData.price,
+                totalPrice: totalPrice,
+                freeItems: priceData.freeItems,
+                timestamp: new Date().toLocaleString()
+            };
             
             try {
-                // Step 1: Create PaymentIntent on your server
-                const response = await fetch('YOUR_BACKEND_URL/create-payment-intent', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        amount: amount,
-                        currency: 'usd',
-                        customer_name: name,
-                        customer_email: email,
-                        customer_phone: phone,
-                        shipping_address: address,
-                        product_type: product,
-                        size: size,
-                        quantity: qty,
-                        color: color
-                    })
-                });
+                // Send order to your email using EmailJS
+                const templateParams = {
+                    order_number: orderNumber,
+                    customer_name: name,
+                    customer_email: email,
+                    customer_phone: phone,
+                    shipping_address: address,
+                    product_type: currentOrder.product,
+                    size: size,
+                    color: color,
+                    quantity: qty,
+                    unit_price: priceData.price > 0 ? `$${priceData.price}` : 'Custom Quote',
+                    total_price: totalPrice > 0 ? `$${totalPrice}` : 'Custom Quote',
+                    free_items: priceData.freeItems,
+                    order_date: currentOrder.timestamp,
+                    payment_method: 'Zelle',
+                    zelle_number: '240-940-8778',
+                    zelle_name: 'Everlasting Custom Print LLC'
+                };
                 
-                if (!response.ok) {
-                    throw new Error('Failed to create payment');
-                }
+                // Send email to YOUR business email
+                const response = await emailjs.send(
+                    'service_2xe9bxe', // Replace with your EmailJS service ID
+                    'template_tiwei0g', // Replace with your EmailJS template ID
+                    templateParams
+                );
                 
-                const { clientSecret, error } = await response.json();
-                
-                if (error) {
-                    throw new Error(error);
-                }
-                
-                // Update modal message
-                paymentMessage.textContent = 'Confirming Payment...';
-                paymentDetails.textContent = 'Please confirm your payment details';
-                
-                // Step 2: Confirm card payment with Stripe
-                const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-                    payment_method: {
-                        card: cardElement,
-                        billing_details: {
-                            name: name,
-                            email: email,
-                            phone: phone,
-                            address: {
-                                line1: address
-                            }
-                        }
-                    }
-                });
-                
-                if (stripeError) {
-                    throw new Error(stripeError.message);
-                }
-                
-                if (paymentIntent.status === 'succeeded') {
-                    // Payment successful
-                    paymentSpinner.style.display = 'none';
-                    paymentMessage.innerHTML = '<div class="payment-success"><i class="fas fa-check-circle"></i></div>';
-                    paymentMessage.textContent = 'Payment Successful!';
-                    paymentDetails.textContent = 'Your order has been placed successfully';
+                if (response.status === 200) {
+                    // Show success message
+                    document.getElementById('order-form').style.display = 'none';
+                    document.getElementById('success-message').style.display = 'block';
+                    document.getElementById('success-order-number').textContent = orderNumber;
+                    document.getElementById('success-order-amount').textContent = totalPrice > 0 ? `$${totalPrice}` : 'Custom Quote';
                     
-                    // Send confirmation emails via EmailJS
-                    try {
-                        // Send confirmation to customer
-                        await emailjs.send('service_2xe9bxe', 'template_tiwei0g', {
-                            to_name: name,
-                            to_email: email,
-                            order_number: paymentIntent.id.substring(0, 8),
-                            order_date: new Date().toLocaleDateString(),
-                            order_total: '$' + (amount / 100).toFixed(2),
-                            product_type: getProductName(product),
-                            size: size,
-                            quantity: qty,
-                            color: color,
-                            shipping_address: address
-                        });
-                        
-                        // Send notification to business
-                        await emailjs.send('service_2xe9bxe', 'template_5gsl6lj', {
-                            customer_name: name,
-                            customer_email: email,
-                            customer_phone: phone,
-                            order_number: paymentIntent.id.substring(0, 8),
-                            order_total: '$' + (amount / 100).toFixed(2),
-                            product_type: getProductName(product),
-                            size: size,
-                            quantity: qty,
-                            color: color,
-                            shipping_address: address,
-                            order_date: new Date().toLocaleDateString(),
-                            order_time: new Date().toLocaleTimeString()
-                        });
-                        
-                    } catch (emailError) {
-                        console.error('Email sending failed:', emailError);
-                        // Continue even if email fails
-                    }
-                    
-                    // Reset form after delay
+                    // Show Zelle payment modal
                     setTimeout(() => {
-                        paymentModal.style.display = 'none';
-                        form.reset();
-                        cardElement.clear();
-                        submitButton.disabled = false;
-                        submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay Securely with Stripe';
-                        document.getElementById('qty').value = '1';
-                        calcPrice();
-                        
-                        // Show success message
-                        alert(`🎉 Payment Successful!\n\nOrder #: ${paymentIntent.id.substring(0, 8)}\nAmount: $${(amount/100).toFixed(2)}\n\nA confirmation email has been sent to ${email}. We will contact you shortly with production updates.`);
-                        
-                    }, 3000);
+                        showZelleModal();
+                    }, 1000);
+                    
+                    // Reset button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
                     
                 } else {
-                    throw new Error('Payment failed. Please try again.');
+                    throw new Error('Failed to send email');
                 }
                 
             } catch (error) {
-                console.error('Payment error:', error);
+                console.error('Error sending email:', error);
                 
-                // Hide modal and show error
-                paymentModal.style.display = 'none';
+                // Fallback: Show Zelle modal even if email fails
+                document.getElementById('order-form').style.display = 'none';
+                document.getElementById('success-message').style.display = 'block';
+                document.getElementById('success-order-number').textContent = orderNumber;
+                document.getElementById('success-order-amount').textContent = totalPrice > 0 ? `$${totalPrice}` : 'Custom Quote';
+                
+                // Show Zelle payment modal
+                setTimeout(() => {
+                    showZelleModal();
+                }, 1000);
+                
+                // Reset button
                 submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fas fa-lock"></i> Pay Securely with Stripe';
-                
-                // Show specific error message
-                document.getElementById('card-errors').textContent = error.message || 'An error occurred. Please try again.';
-                
-                // Alert user
-                alert('Payment failed: ' + error.message);
+                submitButton.innerHTML = originalButtonText;
             }
-        });
-        
-        // Helper function to get product name
-        function getProductName(productType) {
-            const products = {
-                'tshirt': 'Custom T-Shirt',
-                'hoodie': 'Custom Hoodie',
-                'polo': 'Custom Polo Shirt',
-                'sweatshirt': 'Custom Sweatshirt',
-                'mug': 'Custom Mug'
-            };
-            return products[productType] || 'Custom Product';
         }
-        
+
+        // Show Zelle payment modal
+        function showZelleModal() {
+            // Update modal with order details
+            document.getElementById('order-num-display').textContent = orderNumber;
+            document.getElementById('zelle-amount').textContent = currentOrder.totalPrice > 0 ? `$${currentOrder.totalPrice}` : 'Custom Quote';
+            document.getElementById('zelle-amount-step').textContent = currentOrder.totalPrice > 0 ? `$${currentOrder.totalPrice}` : 'Custom Quote';
+            document.getElementById('order-note').textContent = `Order #${orderNumber}`;
+            
+            // Show modal
+            document.getElementById('zelle-modal').style.display = 'flex';
+        }
+
+        // Copy Zelle details to clipboard
+        function copyZelleDetails() {
+            const zelleNumber = '240-940-8778';
+            const details = `Everlasting Custom Print LLC
+Order #: ${orderNumber}
+Amount: ${currentOrder.totalPrice > 0 ? `$${currentOrder.totalPrice}` : 'Custom Quote'}
+Zelle: ${zelleNumber}
+Name: Everlasting Custom Print LLC`;
+            
+            navigator.clipboard.writeText(details).then(() => {
+                alert('Payment details copied to clipboard!');
+            });
+        }
+
+        // Send WhatsApp confirmation
+        function sendWhatsAppConfirmation() {
+            const message = `Order Confirmation
+Order #: ${orderNumber}
+Name: ${currentOrder.name}
+Product: ${currentOrder.product}
+Size: ${currentOrder.size}
+Color: ${currentOrder.color}
+Quantity: ${currentOrder.quantity}
+Total: ${currentOrder.totalPrice > 0 ? `$${currentOrder.totalPrice}` : 'Custom Quote'}
+Free Items: ${currentOrder.freeItems}
+
+I have completed Zelle payment to 240-940-8778 for ${currentOrder.totalPrice > 0 ? `$${currentOrder.totalPrice}` : 'custom quote amount'}.
+Please confirm receipt.`;
+            
+            window.open(`https://wa.me/12409408778?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        // Close Zelle modal
+        function closeZelleModal() {
+            document.getElementById('zelle-modal').style.display = 'none';
+        }
+
         // ============================
         // YOUR EXISTING PAGE FUNCTIONALITY
         // ============================
         
-        // Close offer popup
-        function closeOffer() {
+        // Show popup after delay
+        setTimeout(function(){
             const popup = document.getElementById('offer-popup');
             if(popup) {
-                popup.style.opacity = '0';
-                popup.style.transform = 'translateX(100px) scale(0.95)';
-                setTimeout(() => {
-                    popup.style.display = 'none';
-                }, 300);
-                
-                // Save to localStorage so it doesn't show again for 24 hours
-                localStorage.setItem('offerClosed', Date.now());
+                popup.style.display = 'block';
+            }
+        }, 3000);
+
+        // Close popup
+        function closeOffer(){
+            const popup = document.getElementById('offer-popup');
+            if(popup) {
+                popup.style.display = 'none';
             }
         }
 
@@ -1858,29 +1947,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             calcPrice();
             
-            // Check if offer was recently closed (don't show for 24 hours)
-            const lastClosed = localStorage.getItem('offerClosed');
-            const offerPopup = document.getElementById('offer-popup');
-            
-            if(offerPopup && lastClosed) {
-                const hoursSinceClose = (Date.now() - lastClosed) / (1000 * 60 * 60);
-                if(hoursSinceClose < 24) {
-                    offerPopup.style.display = 'none';
-                } else {
-                    // Auto-hide after 30 seconds
-                    setTimeout(() => {
-                        if(offerPopup.style.display !== 'none') {
-                            closeOffer();
-                        }
-                    }, 30000);
-                }
-            } else if(offerPopup) {
-                // Auto-hide after 30 seconds if first time
-                setTimeout(() => {
-                    if(offerPopup.style.display !== 'none') {
-                        closeOffer();
-                    }
-                }, 30000);
+            // Set up form submission
+            const form = document.getElementById('order-form');
+            if(form) {
+                form.addEventListener('submit', processOrder);
             }
             
             // Carousel setup
@@ -1916,42 +1986,25 @@
                 }
             }
             
-            // Add gold accent to interactive elements
-            document.querySelectorAll('a, button').forEach(element => {
-                element.addEventListener('mouseenter', function() {
-                    this.style.boxShadow = '0 4px 15px rgba(255, 215, 0, 0.3)';
-                });
-                element.addEventListener('mouseleave', function() {
-                    this.style.boxShadow = '';
-                });
-            });
-            
-            // Logo hover enhancement
-            const logo = document.querySelector('.main-logo');
-            if(logo) {
-                logo.addEventListener('mouseenter', function() {
-                    this.style.filter = 'drop-shadow(0 0 12px rgba(255, 215, 0, 0.4))';
-                });
-                logo.addEventListener('mouseleave', function() {
-                    this.style.filter = 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.2))';
-                });
-            }
-            
-            // Color selection interaction
-            document.querySelectorAll('.color-option').forEach(option => {
-                option.addEventListener('mouseenter', function() {
-                    const circle = this.querySelector('.color-circle');
-                    circle.style.transform = 'scale(1.05)';
-                });
-                
-                option.addEventListener('mouseleave', function() {
-                    const circle = this.querySelector('.color-circle');
-                    const radio = this.querySelector('input[type="radio"]');
-                    if(!radio.checked) {
-                        circle.style.transform = 'scale(1)';
+            // File upload validation
+            const artworkInput = document.getElementById('artwork');
+            if(artworkInput) {
+                artworkInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if(file){
+                        const validTypes = ['image/png', 'image/jpeg', 'application/pdf', 'application/illustrator'];
+                        const maxSize = 10 * 1024 * 1024; // 10MB
+                        
+                        if(!validTypes.includes(file.type)){
+                            alert('Please upload PNG, JPG, PDF, or AI files only.');
+                            this.value = '';
+                        } else if(file.size > maxSize){
+                            alert('File size must be less than 10MB.');
+                            this.value = '';
+                        }
                     }
                 });
-            });
+            }
         });
     </script>
 </body>
