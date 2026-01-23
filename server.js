@@ -1,18 +1,51 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
-app.use(cors());
+
+// ✅ FIXED CORS CONFIGURATION
+app.use(cors({
+    origin: [
+        'https://everlasting-landing-page.vercel.app', // Your Vercel frontend
+        'https://everlastingcustomprint.com', // Your domain if you have one
+        'http://localhost:5500', // Live Server
+        'http://localhost:3000' // React dev server
+    ],
+    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+}));
+
+// ✅ Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
-app.use(express.static('public'));
 
 // Store orders (in production, use a database)
 const orders = new Map();
 
+// Root endpoint
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Everlasting Custom Print Backend',
+        status: 'Running',
+        timestamp: new Date().toISOString(),
+        endpoints: {
+            health: '/health',
+            createCheckout: '/create-checkout-session',
+            order: '/order/:orderId'
+        }
+    });
+});
+
 // Create Stripe checkout session
 app.post('/create-checkout-session', async (req, res) => {
+    console.log('🛒 Payment request from:', req.headers.origin);
+    console.log('📦 Order data:', req.body);
+    
     try {
         const {
             name,
@@ -27,6 +60,13 @@ app.post('/create-checkout-session', async (req, res) => {
             freeItems,
             priceInCents
         } = req.body;
+
+        // Validate required fields
+        if (!priceInCents || priceInCents < 50) {
+            return res.status(400).json({ 
+                error: 'Invalid amount. Minimum is $0.50' 
+            });
+        }
 
         // Create order ID
         const orderId = `ECP-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
@@ -56,8 +96,8 @@ app.post('/create-checkout-session', async (req, res) => {
                     price_data: {
                         currency: 'usd',
                         product_data: {
-                            name: `${product} (${size}, ${color})`,
-                            description: `Quantity: ${quantity} | Free Items: ${freeItems} | Shipping included`
+                            name: `${product} - Custom Order`,
+                            description: `Size: ${size} | Color: ${color} | Quantity: ${quantity}${freeItems > 0 ? ` | Free Items: ${freeItems}` : ''}`
                         },
                         unit_amount: priceInCents,
                     },
@@ -65,90 +105,51 @@ app.post('/create-checkout-session', async (req, res) => {
                 },
             ],
             mode: 'payment',
-            success_url: `${process.env.DOMAIN}/success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
-            cancel_url: `${process.env.DOMAIN}/cancel.html`,
+            success_url: `https://everlasting-landing-page.vercel.app/success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
+            cancel_url: `https://everlasting-landing-page.vercel.app/#order`,
             customer_email: email,
             metadata: {
                 orderId,
                 customerName: name,
                 customerPhone: phone,
                 customerAddress: address,
-                productDetails: JSON.stringify({
-                    product,
-                    size,
-                    quantity,
-                    color,
-                    freeItems
-                })
+                product: product,
+                size: size,
+                quantity: quantity,
+                color: color,
+                freeItems: freeItems || 0
             },
             shipping_address_collection: {
                 allowed_countries: ['US'],
-            },
-            billing_address_collection: 'required',
-            phone_number_collection: {
-                enabled: true,
             }
         });
 
+        console.log('✅ Stripe session created:', session.id);
+        
         res.json({ 
+            success: true,
             id: session.id,
             orderId: orderId
         });
         
     } catch (error) {
-        console.error('Error creating checkout session:', error);
+        console.error('❌ Error creating checkout session:', error);
         res.status(500).json({ 
-            error: 'Unable to create payment session',
-            message: error.message 
+            success: false,
+            error: error.message,
+            code: error.code || 'unknown_error'
         });
     }
 });
 
-// Stripe webhook for payment confirmation
-app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {
-    const sig = req.headers['stripe-signature'];
-    let event;
-
-    try {
-        event = stripe.webhooks.constructEvent(
-            req.body,
-            sig,
-            process.env.STRIPE_WEBHOOK_SECRET
-        );
-    } catch (err) {
-        console.error(`Webhook Error: ${err.message}`);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    // Handle successful payment
-    if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
-        const orderId = session.metadata.orderId;
-        
-        if (orderId && orders.has(orderId)) {
-            const order = orders.get(orderId);
-            order.status = 'paid';
-            order.paymentId = session.payment_intent;
-            order.customerId = session.customer;
-            order.paidAt = new Date().toISOString();
-            
-            // Here you would:
-            // 1. Save to database
-            // 2. Send confirmation email
-            // 3. Notify your team
-            // 4. Update inventory
-            
-            console.log(`✅ Order ${orderId} paid successfully`);
-            console.log(`   Customer: ${order.name}`);
-            console.log(`   Amount: $${order.price}`);
-            console.log(`   Product: ${order.product} x${order.quantity}`);
-            
-            // Example: Send email notification
-            // await sendOrderConfirmation(order);
-        }
-    }
-
-    res.json({ received: true });
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        service: 'Everlasting Custom Print API',
+        stripe: process.env.STRIPE_SECRET_KEY ? 'Configured' : 'Missing',
+        timestamp: new Date().toISOString()
+    });
 });
 
 // Get order details
@@ -161,17 +162,10 @@ app.get('/order/:orderId', (req, res) => {
     }
 });
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'ok', 
-        service: 'Everlasting Custom Print API',
-        timestamp: new Date().toISOString()
-    });
-});
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`💰 Stripe Mode: ${process.env.STRIPE_SECRET_KEY?.startsWith('sk_live') ? 'LIVE' : 'TEST'}`);
+    console.log(`🚀 Everlasting Custom Print Backend running on port ${PORT}`);
+    console.log(`✅ CORS enabled for: everlasting-landing-page.vercel.app`);
+    console.log(`✅ Health endpoint: /health`);
+    console.log(`✅ Payment endpoint: /create-checkout-session`);
 });
