@@ -119,6 +119,48 @@ function calcPrice() {
     return { total, freeItems, priceInCents };
 }
 
+// TEST BACKEND CONNECTION
+async function testBackendConnection() {
+    console.log('🔍 Testing backend connection...');
+    
+    // Test both possible endpoints
+    const endpoints = [
+        '/api/create-checkout-session',  // Most likely
+        '/create-checkout-session',      // Alternative
+        '/api/checkout',
+        '/checkout',
+        '/health',                       // Common health check
+        '/'                              // Root endpoint
+    ];
+    
+    const testData = { test: true, amount: 1000, timestamp: new Date().toISOString() };
+    
+    for (const endpoint of endpoints) {
+        try {
+            const startTime = Date.now();
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testData)
+            });
+            const timeTaken = Date.now() - startTime;
+            
+            if (response.ok) {
+                const data = await response.json().catch(() => ({}));
+                console.log(`✅ ${endpoint}: ${response.status} (${timeTaken}ms)`, data);
+                return endpoint; // Found working endpoint
+            } else {
+                console.log(`❌ ${endpoint}: ${response.status} ${response.statusText} (${timeTaken}ms)`);
+            }
+        } catch (error) {
+            console.log(`❌ ${endpoint}: ERROR - ${error.message}`);
+        }
+    }
+    
+    console.log('❌ No working endpoints found. Check backend URL and CORS.');
+    return null;
+}
+
 // Stripe Payment Function
 async function initiateStripePayment() {
     // Get form data
@@ -212,8 +254,17 @@ async function initiateStripePayment() {
         // Save order data to localStorage for backup
         localStorage.setItem('pendingOrder', JSON.stringify(orderData));
         
-        // Create checkout session with YOUR Render backend - FIXED LINE 77
-        const response = await fetch(`${API_URL}/create-checkout-session`, {  // REMOVED /api
+        // TEST FIRST: Try to find working endpoint
+        const workingEndpoint = await testBackendConnection();
+        
+        if (!workingEndpoint) {
+            throw new Error('Cannot connect to payment server. Please try again later or contact us.');
+        }
+        
+        console.log('Using endpoint:', workingEndpoint);
+        
+        // Create checkout session with working endpoint
+        const response = await fetch(`${API_URL}${workingEndpoint}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -221,11 +272,19 @@ async function initiateStripePayment() {
             body: JSON.stringify(orderData)
         });
         
+        console.log('Response status:', response.status);
+        
         if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
+            const errorText = await response.text();
+            console.error('Server response:', errorText);
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
         }
         
         const session = await response.json();
+        
+        if (!session.id) {
+            throw new Error('Invalid response from payment server');
+        }
         
         // Redirect to Stripe Checkout
         const result = await stripe.redirectToCheckout({
@@ -239,12 +298,23 @@ async function initiateStripePayment() {
     } catch (error) {
         console.error('Payment Error:', error);
         
-        // Fallback payment method if backend is down
-        const useFallback = confirm(`Payment system error: ${error.message}\n\nWould you like to use our direct payment link instead?`);
+        // Show detailed error for debugging
+        const debugInfo = `
+Payment Error Details:
+${error.message}
+
+Backend URL: ${API_URL}
+Stripe Key: ${stripe._apiKey ? 'Loaded' : 'Not loaded'}
+Time: ${new Date().toLocaleTimeString()}
+        `;
+        console.log(debugInfo);
         
-        if (useFallback) {
-            // Create a direct Stripe payment link
-            createDirectPaymentLink({
+        // Try alternative endpoint as fallback
+        const tryAltEndpoint = confirm(`Payment Error: ${error.message}\n\nWould you like to try an alternative payment method?`);
+        
+        if (tryAltEndpoint) {
+            // Use Stripe directly without backend
+            tryDirectStripePayment({
                 name,
                 email,
                 phone,
@@ -271,45 +341,72 @@ async function initiateStripePayment() {
     }
 }
 
-// Fallback: Create direct Stripe payment link
-function createDirectPaymentLink(orderData) {
-    const productDescription = `${orderData.product} - Size: ${orderData.size}, Color: ${orderData.color}, Qty: ${orderData.quantity}`;
+// Alternative: Direct Stripe Checkout Link (Fallback)
+async function tryDirectStripePayment(orderData) {
+    // Create a Stripe Checkout link manually
+    const successUrl = `${window.location.origin}/success.html?order=${encodeURIComponent(JSON.stringify(orderData))}`;
+    const cancelUrl = window.location.href;
     
-    // Create a simple payment page
-    const paymentPage = `
+    // Open manual payment instructions
+    const manualPaymentHTML = `
+        <!DOCTYPE html>
         <html>
         <head>
-            <title>Complete Your Payment - Everlasting Custom Print</title>
+            <title>Complete Your Payment</title>
             <style>
-                body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
-                .container { border: 2px solid #4169E1; border-radius: 10px; padding: 30px; }
+                body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+                .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
                 h1 { color: #001F3F; }
-                .order-details { background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; }
+                .details { background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; }
+                .payment-methods { margin-top: 30px; }
+                .method { background: #e8f4ff; padding: 15px; border-radius: 5px; margin: 10px 0; }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>Complete Your Payment</h1>
-                <div class="order-details">
+                <h1>Complete Your Order</h1>
+                <div class="details">
+                    <h3>Order Details:</h3>
                     <p><strong>Product:</strong> ${orderData.product}</p>
                     <p><strong>Size:</strong> ${orderData.size}</p>
                     <p><strong>Color:</strong> ${orderData.color}</p>
                     <p><strong>Quantity:</strong> ${orderData.quantity}</p>
                     <p><strong>Total:</strong> $${orderData.price}</p>
                 </div>
-                <p>Please contact us at 240-940-8778 to complete your payment via phone or send payment to:</p>
-                <p><strong>Zelle:</strong> 240-940-8778</p>
-                <p><strong>Cash App:</strong> $EverlastingPrint</p>
-                <p><strong>Venmo:</strong> @EverlastingPrint</p>
-                <button onclick="window.history.back()">Back to Order Form</button>
+                
+                <div class="payment-methods">
+                    <h3>Payment Options:</h3>
+                    
+                    <div class="method">
+                        <h4>Option 1: Credit/Debit Card</h4>
+                        <p>Please visit: <a href="https://buy.stripe.com/test_14k9D37p8dxR2mM5kk" target="_blank">Stripe Checkout Page</a></p>
+                    </div>
+                    
+                    <div class="method">
+                        <h4>Option 2: Contact Us Directly</h4>
+                        <p>Call or WhatsApp: <a href="tel:2409408778">(240) 940-8778</a></p>
+                        <p>WhatsApp: <a href="https://wa.me/12409408778" target="_blank">Chat Now</a></p>
+                    </div>
+                    
+                    <div class="method">
+                        <h4>Option 3: Alternative Payments</h4>
+                        <p>Zelle: 240-940-8778</p>
+                        <p>Cash App: $EverlastingPrint</p>
+                        <p>Venmo: @EverlastingPrint</p>
+                    </div>
+                </div>
+                
+                <button onclick="window.history.back()" style="padding: 10px 20px; background: #001F3F; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Back to Order Form
+                </button>
             </div>
         </body>
         </html>
     `;
     
-    // Open in new window
-    const win = window.open();
-    win.document.write(paymentPage);
+    const paymentWindow = window.open('', '_blank');
+    paymentWindow.document.write(manualPaymentHTML);
+    paymentWindow.document.close();
 }
 
 // Show error message
@@ -363,6 +460,33 @@ function closeOffer() {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize price calculator
     calcPrice();
+    
+    // Add test connection button for debugging (optional)
+    const debugBtn = document.createElement('button');
+    debugBtn.textContent = '🔧 Test Payment Connection';
+    debugBtn.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 10000;
+        background: #FF6600;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        font-size: 12px;
+        cursor: pointer;
+        display: none; /* Hidden by default */
+    `;
+    debugBtn.onclick = testBackendConnection;
+    document.body.appendChild(debugBtn);
+    
+    // Show debug button on Shift+Ctrl+D
+    document.addEventListener('keydown', (e) => {
+        if (e.shiftKey && e.ctrlKey && e.key === 'D') {
+            debugBtn.style.display = debugBtn.style.display === 'none' ? 'block' : 'none';
+        }
+    });
     
     // Check if offer was recently closed
     const lastClosed = localStorage.getItem('offerClosed');
